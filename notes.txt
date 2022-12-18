@@ -1,22 +1,15 @@
-Die Idee ist in STUMPY Dilation einzubauen? 
-Die Idee war aber nicht, STUMP mit Dilation zu beschleunigen richtig?
-
 Die Idee ist mit Dilation neue Charakteristiken in den Zeitreihen zu finden.
 -> Ziel ist also zum Beispiel ein neues Motif zu finden mit Dilation (die Schwierigkeit wird dann zu begründen, was dieses motif nun ist und mit domainwissen den Fund zu begründen)
+-> dafür wird z.B. dilations size = 2 gesetzt und dann alle use cases getestet
 
 
-
--> dafür wird dilations size = 2 gesetzt und dann alle use cases getestet
-
-Die Matrix Profile werden als Input genommen und dieser Input dilated
-
-
-1. TS, m
-2. MP
-3. Dilated MP
-4. Use Case
+1. TS -dilationMaping-> dilated TS
+2. dilated TS, m -stumpy-> MP 
+3. MP, NNIndex -dilationMapping-> fixedMP
+4. Test Use Cases
 
 
+Beispiel Output Stumpy MP:
 [[2.0911796863140517 3 -1 3]
  [1.6790458917529159 8 -1 8]
  [2.7568667215042795 7 -1 7]
@@ -26,3 +19,22 @@ Die Matrix Profile werden als Input genommen und dieser Input dilated
  [3.5980219031954253 1 1 -1]
  [2.7568667215042795 2 2 -1]
  [1.2368147080556748 3 3 -1]]
+
+
+
++++FIX INDEX+++
+Index: 	0 1 2 3 4 5 6 7
+TS:		2 3 4 5 6 7 8 9
+
+Orig Index:	0 2 4 6 1 3 5 7
+New Index:	0 1 2 3 4 5 6 7
+Dil TS:	2 4 6 8 3 5 7 9
+
+Restore old Index:
+New Index:	0 1 2 3 4 5 6 7  -dilationMapping-> 0 2 4 6 1 3 5 7
+
+
+
+
+Fragen:
+- Index “left” Nearest Neighbor, Index “right” Nearest Neighbor sind dann irrelevant? Diese sind dann ja nicht mehr korrekt
