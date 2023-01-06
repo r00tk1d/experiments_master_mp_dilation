@@ -10,3 +10,8 @@
 7. `cd stumpy_master_mp_dilation`
 8. `pip install --editable .`
 9. Install Jupyter Kernel (`conda install -n myenv ipykernel --update-deps --force-reinstall`)
+
+
+## Known Problems ##
+
+Stumpy Import Error: version 'GLIBCXX_3.4.30' not found: `conda install -c conda-forge gcc=12.1.0`

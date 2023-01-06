@@ -1,0 +1,21 @@
+STOMP (line explanation):
+1: specify $T$, $m$
+2: Compute Mean and StandardDeviation for each subsequence in T with length $m$
+3: SlidingDotProduct Vector $QT_{first}$ from first subsequence $T_1,m$ and all other subsequences from T (for fast convolution, FFT is used)
+4: CalculateDistanceProfile $D_1$ for first subsequence $T_{1,m}$ with: $d_{1,j}$ for all $j$ 1 to $n-m+1$
+5: Initialize MatrixProfile $P$ and MatrixProfileIndex $I$
+6: Looping through the Time Series $T$ starting at position $i=2$ and going upwards
+    7: Looping through the Time Series $T$ starting at position $j=l$ and going downwards
+        8: Update $QT[j]$ with the new algorithm that uses $QT[j-1]$
+    10: Set $QT[1]$ to $QT_{first}[i]$
+    11: CalculateDistanceProfile $D_i$ for subsequence $T_{i,m}$ with: $d_{i,j}$ for all $j$ 1 to $n-m+1$
+    12: Compare every element of MatrixProfile $P$ with $D_i$. If the value in $D_i[j]$ < $P[j]$, update $P[j]$ with $D_i[j]$ and set $I[j]=i$
+14: Return MatrixProfile $P$ and MatrixProfileIndex $I$
+
+
+stump:
+
+
+
+
+
