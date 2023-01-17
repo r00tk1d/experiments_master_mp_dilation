@@ -1,7 +1,7 @@
 STOMP (line explanation):
 1: specify $T$, $m$
 2: Compute Mean and StandardDeviation for each subsequence in T with length $m$
-3: SlidingDotProduct Vector $QT_{first}$ from first subsequence $T_1,m$ and all other subsequences from T (for fast convolution, FFT is used)
+3: SlidingDotProduct Vector $QT_{first}$ from first subsequence $T_{1,m}$ and all other subsequences from T (for fast convolution, FFT is used) (the result is a distance profile for $T_{1,m}$)
 4: CalculateDistanceProfile $D_1$ for first subsequence $T_{1,m}$ with: $d_{1,j}$ for all $j$ 1 to $n-m+1$
 5: Initialize MatrixProfile $P$ and MatrixProfileIndex $I$
 6: Looping through the Time Series $T$ starting at position $i=2$ and going upwards
@@ -12,8 +12,21 @@ STOMP (line explanation):
     12: Compare every element of MatrixProfile $P$ with $D_i$. If the value in $D_i[j]$ < $P[j]$, update $P[j]$ with $D_i[j]$ and set $I[j]=i$
 14: Return MatrixProfile $P$ and MatrixProfileIndex $I$
 
+Note: QT_i,j describes the dot product from T_i and T_j
 
 stump:
+stump()
+    core.preprocess_diagonal(T_A, m) 
+        # computes mean $M_T$ computes means `M_T` and `M_T_m_1`, for every subsequence using a window size of `m` and `m-1`
+        # computes the inverse sliding standard deviation of time series, `T`, `Σ_T_inverse`
+        # computes the inverse standard deviation, σ_inverse / Σ_inverse
+        # constant subsequences (i.e., subsequences with a standard deviation of zero), will have a corresponding `True` value in its `T_subseq_isconstant` array
+    core.preprocess_diagonal(T_B, m)
+    diags = np.arange(x,y, dtype=np.int64) # creates an array starting at x, ending at y, stepsize 1
+    P, PL, PR, I, IL, IR = _stump() # parallelized
+
+    
+
 
 
 

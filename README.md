@@ -11,6 +11,8 @@
 8. `pip install --editable .`
 9. Install Jupyter Kernel (`conda install -n myenv ipykernel --update-deps --force-reinstall`)
 
+## Good to Know ##
+If you make chances in stumpy, restart the jupyter kernel to apply the changes and use them in the jupyter notebook
 
 ## Known Problems ##
 
