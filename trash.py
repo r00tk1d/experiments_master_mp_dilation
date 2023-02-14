@@ -42,3 +42,24 @@ print(f"MP dilated fixed: {mp_dilated_fixed}")
 # mp[mp_idx, 1] -> Index Nearest Neighbor
 # mp[mp_idx, 2] -> Index “left” Nearest Neighbor
 # mp[mp_idx, 3] -> Index “right” Nearest Neighbor
+
+
+# Altes Index Mapping:
+def ceildiv(a, b):
+    return -(a // -b)
+
+def fix_index(x,d,n):
+    return ceildiv(n,d) * (x % d) + (x // d)
+
+T_A = np.array([1,2,3,6,6,4,7,1,2,3,2,3,12,3,1,2,4,12,13,4,5,6,21,1,4,2]).astype(np.float64)
+n = T_A.shape[0]
+d = 5
+
+i = 1
+new_i = fix_index(i,d,n)
+print(new_i)
+
+# for testing all indice:
+index = np.arange(n)
+new_list = [fix_index(x,d,n) for x in index]
+print(new_list)
