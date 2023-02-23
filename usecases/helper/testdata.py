@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 
+### UCR .tsv ###
 fast_datasets = [
     # 'ACSF1',
     # 'Adiac',
@@ -292,3 +293,7 @@ def all_ucr_datasets(ucr_path: str) -> any:
 
 def fast_ucr_datasets(ucr_path: str) -> any:
     pass
+
+### .txt ###
+def load_from_txt(path: str) -> npt.NDArray[np.float64]:
+    return np.loadtxt(path, dtype=np.float64)
