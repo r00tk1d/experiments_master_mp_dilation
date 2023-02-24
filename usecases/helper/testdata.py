@@ -297,3 +297,7 @@ def fast_ucr_datasets(ucr_path: str) -> any:
 ### .txt ###
 def load_from_txt(path: str) -> npt.NDArray[np.float64]:
     return np.loadtxt(path, dtype=np.float64)
+
+### .csv ###
+def load_from_csv(path: str) -> npt.NDArray[np.float64]:
+    return np.genfromtxt(path, delimiter=',')

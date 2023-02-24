@@ -42,22 +42,24 @@ def motif_pair(mp, T, m, d) -> None:
 def chain_unanchored(T, unanchored_chain, m, d):
     r = ((m-1)*d + 1)
     T = pd.DataFrame(T)
+    plt.figure(figsize=(12, 4))
     plt.plot(T, linewidth=1, color='black')
     for i in range(unanchored_chain.shape[0]):
-        y = T[unanchored_chain[i]:unanchored_chain[i]+r]
+        y = T.iloc[unanchored_chain[i]:unanchored_chain[i]+r]
         x = y.index.values
         plt.plot(x, y, linewidth=3)
     plt.suptitle('Unanchored Chain (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
-    plt.show()
+    return plt
 
 def chain_unanchored_snippets(T, unanchored_chain, m, d):
     r = ((m-1)*d + 1)
     T = pd.DataFrame(T)
+    plt.figure(figsize=(12, 4))
     plt.axis('off')
     for i in range(unanchored_chain.shape[0]):
-        data = T[unanchored_chain[i]:unanchored_chain[i]+r].reset_index().values
+        data = T.iloc[unanchored_chain[i]:unanchored_chain[i]+r].reset_index().values
         x = data[:, 0]
         y = data[:, 1]
-        plt.plot(x-x.min()+(r+5)*i, y-y.min(), linewidth=3)
+        plt.plot(x-x.min()+(r+15)*i, y-y.min(), linewidth=3)
     plt.suptitle('Unanchored Chain (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
-    plt.show()
+    return plt
