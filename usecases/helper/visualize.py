@@ -63,3 +63,32 @@ def chain_unanchored_snippets(T, unanchored_chain, m, d):
         plt.plot(x-x.min()+(r+15)*i, y-y.min(), linewidth=3)
     plt.suptitle('Unanchored Chain (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
     return plt
+
+def segmentation_regimecac(T, m, d, L, n_regimes, excl_factor, mp, cac, regime_locations):
+    plt.figure(figsize=(16, 4))
+    fig, axs = plt.subplots(2, sharex=True, gridspec_kw={'hspace': 0})
+    axs[0].plot(range(T.shape[0]), T)
+    axs[1].plot(range(cac.shape[0]), cac, color='C1')
+    for regime_location in regime_locations:
+        axs[0].axvline(x=regime_location, linestyle="dashed")
+        axs[1].axvline(x=regime_location, linestyle="dashed")
+    plt.suptitle('Regimes (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
+    axs[1].set_xlabel('Time', fontsize ='10')
+    axs[0].set_ylabel('Time Series', fontsize='10')
+    axs[1].set_ylabel('Arc Curve', fontsize='10')
+    return plt
+
+# def segmentation_regimecac_snippets(T, m, d, L, n_regimes, excl_factor, mp, cac, regime_locations):
+#     r = ((m-1)*d + 1)
+#     T = pd.DataFrame(T)
+#     start = 25000 - 2500
+#     stop = 25000 + 2500
+#     plt.figure(figsize=(12, 4))
+#     plt.axis('off')
+#     for i in range(unanchored_chain.shape[0]):
+#         data = T.iloc[unanchored_chain[i]:unanchored_chain[i]+r].reset_index().values
+#         x = data[:, 0]
+#         y = data[:, 1]
+#         plt.plot(x-x.min()+(r+15)*i, y-y.min(), linewidth=3)
+#     plt.suptitle('Regimes (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
+#     return plt
