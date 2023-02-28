@@ -40,27 +40,27 @@ def motif_pair(mp, T, m, d) -> None:
     plt.show()
 
 def chain_unanchored(T, unanchored_chain, m, d):
-    r = ((m-1)*d + 1)
+    w = ((m-1)*d + 1)
     T = pd.DataFrame(T)
     plt.figure(figsize=(12, 4))
     plt.plot(T, linewidth=1, color='black')
     for i in range(unanchored_chain.shape[0]):
-        y = T.iloc[unanchored_chain[i]:unanchored_chain[i]+r]
+        y = T.iloc[unanchored_chain[i]:unanchored_chain[i]+w]
         x = y.index.values
         plt.plot(x, y, linewidth=3)
     plt.suptitle('Unanchored Chain (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
     return plt
 
 def chain_unanchored_snippets(T, unanchored_chain, m, d):
-    r = ((m-1)*d + 1)
+    w = ((m-1)*d + 1)
     T = pd.DataFrame(T)
     plt.figure(figsize=(12, 4))
     plt.axis('off')
     for i in range(unanchored_chain.shape[0]):
-        data = T.iloc[unanchored_chain[i]:unanchored_chain[i]+r].reset_index().values
+        data = T.iloc[unanchored_chain[i]:unanchored_chain[i]+w].reset_index().values
         x = data[:, 0]
         y = data[:, 1]
-        plt.plot(x-x.min()+(r+15)*i, y-y.min(), linewidth=3)
+        plt.plot(x-x.min()+(w+15)*i, y-y.min(), linewidth=3)
     plt.suptitle('Unanchored Chain (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
     return plt
 
@@ -79,16 +79,16 @@ def segmentation_regimecac(T, m, d, L, n_regimes, excl_factor, mp, cac, regime_l
     return plt
 
 # def segmentation_regimecac_snippets(T, m, d, L, n_regimes, excl_factor, mp, cac, regime_locations):
-#     r = ((m-1)*d + 1)
+#     w = ((m-1)*d + 1)
 #     T = pd.DataFrame(T)
 #     start = 25000 - 2500
 #     stop = 25000 + 2500
 #     plt.figure(figsize=(12, 4))
 #     plt.axis('off')
 #     for i in range(unanchored_chain.shape[0]):
-#         data = T.iloc[unanchored_chain[i]:unanchored_chain[i]+r].reset_index().values
+#         data = T.iloc[unanchored_chain[i]:unanchored_chain[i]+w].reset_index().values
 #         x = data[:, 0]
 #         y = data[:, 1]
-#         plt.plot(x-x.min()+(r+15)*i, y-y.min(), linewidth=3)
+#         plt.plot(x-x.min()+(w+15)*i, y-y.min(), linewidth=3)
 #     plt.suptitle('Regimes (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
 #     return plt

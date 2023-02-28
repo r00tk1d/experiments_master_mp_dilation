@@ -18,3 +18,7 @@ If you make chances in stumpy, restart the jupyter kernel to apply the changes a
 ## Known Problems ##
 
 Stumpy Import Error: version 'GLIBCXX_3.4.30' not found: `conda install -c conda-forge gcc=12.1.0`
+
+## Semantic Segmentation ##
+There is a dataset for semantic segmentation (MP VIII) which is used in segmentation.py to benchmark.
+
