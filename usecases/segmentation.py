@@ -14,7 +14,7 @@ import helper.results as results
 
 # SETUP
 use_case = "segmentation"
-data_names = ['WalkJogRun2_80_3800_6800.txt', 'PigInternalBleedingDatasetCVP_100_7501.txt', 'Cane_100_2345.txt', 'PulsusParadoxusSP02_30_10000.txt', 'InsectEPG1_50_3802.txt', 'RoboticDogActivityX_60_8699.txt', 'Fetal2013_70_6000_12000.txt', 'WalkJogRun1_80_3800_6800.txt', 'RoboticDogActivityY_60_10699.txt', 'PigInternalBleedingDatasetAirwayPressure_400_7501.txt', 'InsectEPG2_50_1800.txt', 'SuddenCardiacDeath2_25_3250.txt', 'GrandMalSeizures_10_8200.txt', 'NogunGun_150_3000.txt', 'UCR_semantic segmentation_2017.ppt', 'EEGRat_10_1000.txt', 'PulsusParadoxusECG1_30_10000.txt', 'temp.py', 'InsectEPG4_50_3160.txt', 'RoboticDogActivityY_64_4000.txt', 'Powerdemand_12_4500.txt', 'PulsusParadoxusECG2_30_10000.txt', 'PigInternalBleedingDatasetArtPressureFluidFilled_100_7501.txt', 'TiltABP_210_25000.txt', 'InsectEPG3_50_1710.txt', 'SuddenCardiacDeath3_25_3250.txt', 'GrandMalSeizures2_10_4550.txt', 'SuddenCardiacDeath1_25_6200_7600.txt', 'EEGRat2_10_1000.txt', 'GreatBarbet1_50_1900_3700.txt', 'SimpleSynthetic_125_3000_5000.txt', 'DutchFactory_24_2184.txt', 'GreatBarbet2_50_1900_3700.txt', 'TiltECG_200_25000.txt']
+data_names = ['WalkJogRun2_80_3800_6800', 'PigInternalBleedingDatasetCVP_100_7501', 'Cane_100_2345', 'PulsusParadoxusSP02_30_10000', 'InsectEPG1_50_3802', 'RoboticDogActivityX_60_8699', 'Fetal2013_70_6000_12000', 'WalkJogRun1_80_3800_6800', 'RoboticDogActivityY_60_10699', 'PigInternalBleedingDatasetAirwayPressure_400_7501', 'InsectEPG2_50_1800', 'SuddenCardiacDeath2_25_3250', 'GrandMalSeizures_10_8200', 'NogunGun_150_3000', 'EEGRat_10_1000', 'PulsusParadoxusECG1_30_10000', 'InsectEPG4_50_3160', 'RoboticDogActivityY_64_4000', 'Powerdemand_12_4500', 'PulsusParadoxusECG2_30_10000', 'PigInternalBleedingDatasetArtPressureFluidFilled_100_7501', 'TiltABP_210_25000', 'InsectEPG3_50_1710', 'SuddenCardiacDeath3_25_3250', 'GrandMalSeizures2_10_4550', 'SuddenCardiacDeath1_25_6200_7600', 'EEGRat2_10_1000', 'GreatBarbet1_50_1900_3700', 'SimpleSynthetic_125_3000_5000', 'DutchFactory_24_2184', 'GreatBarbet2_50_1900_3700', 'TiltECG_200_25000']
 
 for data_name in data_names:
     T = testdata.load_from_txt("../data/" + use_case + "/" + data_name + ".txt")
@@ -23,7 +23,8 @@ for data_name in data_names:
     # ### stumpy without dilation ###
 
     # SETUP for stumpy without dilation
-    m = data_name.split('_')[1].split('_')[-1]
+    m = int(data_name.split('_')[1].split('_')[-1])
+    print(m)
     d = 1
     L = m
     n_regimes = data_name.count('_')
