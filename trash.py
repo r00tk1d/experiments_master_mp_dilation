@@ -63,3 +63,15 @@ print(new_i)
 index = np.arange(n)
 new_list = [fix_index(x,d,n) for x in index]
 print(new_list)
+
+
+############################
+
+import os
+print(os.listdir("./data/segmentation"))
+
+test_string = 'WalkJogRun2_80_3800_6800.txt'
+print(test_string.split('_')[1].split('_')[-1])
+print(test_string.split('_')[1].split('_')[-1])
+
+##########################

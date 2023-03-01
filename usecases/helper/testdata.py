@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.typing as npt
+import pandas as pd
 
 ### UCR .tsv ###
 fast_datasets = [
@@ -275,7 +276,7 @@ all_datasets = [
     'Yoga'
 ]
 
-def ucr_dataset_from_tsv(ucr_path: str, dataset_name: str, train_test: str) -> tuple[npt.NDArray[np.int64], npt.NDArray[np.float64]]:
+def load_ucr_dataset_from_tsv(ucr_path: str, dataset_name: str, train_test: str) -> tuple[npt.NDArray[np.int64], npt.NDArray[np.float64]]:
 
     path = ucr_path + "/" + dataset_name + "/" + dataset_name + "_" + train_test + ".tsv"
     with open(path, 'r') as f:
@@ -288,10 +289,10 @@ def ucr_dataset_from_tsv(ucr_path: str, dataset_name: str, train_test: str) -> t
 
     return time_series, labels
 
-def all_ucr_datasets(ucr_path: str) -> any:
+def load_all_ucr_datasets(ucr_path: str) -> any:
     pass
 
-def fast_ucr_datasets(ucr_path: str) -> any:
+def load_fast_ucr_datasets(ucr_path: str) -> any:
     pass
 
 ### .txt ###
@@ -299,5 +300,5 @@ def load_from_txt(path: str) -> npt.NDArray[np.float64]:
     return np.loadtxt(path, dtype=np.float64)
 
 ### .csv ###
-def load_from_csv(path: str) -> npt.NDArray[np.float64]:
-    return np.genfromtxt(path, delimiter=',')
+def load_from_csv(path: str, column: str) -> npt.NDArray[np.float64]:
+    return pd.read_csv(path)[column].to_numpy()
