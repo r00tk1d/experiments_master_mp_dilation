@@ -36,29 +36,38 @@ def motif_pair(T, m, d, mp, top_motif_pair_idxs):
     axs[1].plot(mp[:, 0])
     return plt
 
-def chain_unanchored(T, unanchored_chain, m, d):
+def chain_unanchored(T, unanchored_chain, m, d, title):
     w = ((m-1)*d + 1)
     T = pd.DataFrame(T)
-    plt.figure(figsize=(12, 4))
+    plt.figure(figsize=(12, 2))
     plt.plot(T, linewidth=1, color='black')
     for i in range(unanchored_chain.shape[0]):
         y = T.iloc[unanchored_chain[i]:unanchored_chain[i]+w]
         x = y.index.values
         plt.plot(x, y, linewidth=3)
-    plt.suptitle('Unanchored Chain (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
+    plt.suptitle(title + ' (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
     return plt
 
-def chain_unanchored_snippets(T, unanchored_chain, m, d):
+def chain_unanchored_snippets(T, unanchored_chain, m, d, title):
     w = ((m-1)*d + 1)
     T = pd.DataFrame(T)
-    plt.figure(figsize=(12, 4))
+    plt.figure(figsize=(12, 2))
     plt.axis('off')
     for i in range(unanchored_chain.shape[0]):
         data = T.iloc[unanchored_chain[i]:unanchored_chain[i]+w].reset_index().values
         x = data[:, 0]
         y = data[:, 1]
         plt.plot(x-x.min()+(w+15)*i, y-y.min(), linewidth=3)
-    plt.suptitle('Unanchored Chain (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
+    plt.suptitle(title + ' (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
+    return plt
+
+def chain_elbowplot(max_distances: list, ds: list, title: str):
+    plt.figure(figsize=(8,4))
+    plt.plot(ds, max_distances, 'bx-')
+    plt.xlabel('d')
+    plt.ylabel('Max Distance')
+    plt.title(title)
+    plt.xticks(range(1,ds[-1]+1))
     return plt
 
 def segmentation_regimecac(T, m, d, L, n_regimes, excl_factor, mp, cac, regime_locations):

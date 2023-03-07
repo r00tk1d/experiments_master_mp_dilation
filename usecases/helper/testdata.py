@@ -1,6 +1,10 @@
-import numpy as np
 import numpy.typing as npt
-import pandas as pd
+
+import numpy as np
+
+from numpy import loadtxt
+from pandas import read_csv
+from scipy.io import loadmat
 
 ### UCR .tsv ###
 fast_datasets = [
@@ -297,8 +301,13 @@ def load_fast_ucr_datasets(ucr_path: str) -> any:
 
 ### .txt ###
 def load_from_txt(path: str) -> npt.NDArray[np.float64]:
-    return np.loadtxt(path, dtype=np.float64)
+    return loadtxt(path, dtype=np.float64)
 
 ### .csv ###
 def load_from_csv(path: str, column: str) -> npt.NDArray[np.float64]:
-    return pd.read_csv(path)[column].to_numpy()
+    return read_csv(path)[column].to_numpy()
+
+### .mat ###
+def load_from_mat(path: str, column: str) -> npt.NDArray[np.float64]:
+    mat_contents = loadmat(path)
+    return [x[0] for x in mat_contents[column]]
