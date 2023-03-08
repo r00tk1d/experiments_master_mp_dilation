@@ -55,7 +55,7 @@ for data_name in data_names:
         T, m, d, L, n_regimes, excl_factor, mp, cac, regime_locations = results.load(file_path + ".npy")
 
         print(regime_locations)
-        plot = visualize.segmentation_regimecac(T, m, d, L, n_regimes, excl_factor, mp, cac, regime_locations)
+        plot = visualize._segmentation_regimecac(T, m, d, L, n_regimes, excl_factor, mp, cac, regime_locations)
         plot.savefig(file_path + "_regimecac")
         # TODO Visualisierung an Original Paper orientieren: Arc Curve, Time Series, Matrix Profile
 

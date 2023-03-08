@@ -2,7 +2,7 @@ import numpy as np
 import os
 
 
-def calculate_ds(target_w):
+def calculate_dilation_sizes(target_w):
     d = 1
     ds = []
     m = round((target_w-1)/d) + 1
