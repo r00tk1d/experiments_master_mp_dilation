@@ -12,6 +12,11 @@ def calculate_ds(target_w):
         m = round((target_w-1)/d) + 1
     return ds
 
+def get_min_max_from_lists(list1, list2) -> tuple:
+    min_value = min(min(list1), min(list2))
+    max_value = max(max(list1), max(list2))
+    return (min_value, max_value)
+
 def remove_overlapping_chains(all_chain_set, m, d):
     w = (m-1)*d + 1
     all_non_overlapping_chain_set = []
@@ -27,6 +32,8 @@ def remove_overlapping_chains(all_chain_set, m, d):
             non_overlapping_unanchored_chain = _set_best_chain(non_overlapping_unanchored_chain, all_chain_set[i])
     return all_non_overlapping_chain_set, non_overlapping_unanchored_chain
 
+
+
 def _check_non_overlap(seq_one, seq_two, w):
     return seq_one + w < seq_two
 
@@ -36,8 +43,3 @@ def _set_best_chain(current_longest_chain, new_chain):
     elif len(new_chain) == len(current_longest_chain) and new_chain[0] < current_longest_chain[0]:
         return new_chain
     return current_longest_chain
-
-def get_min_max_from_lists(list1, list2) -> tuple:
-    min_value = min(min(list1), min(list2))
-    max_value = max(max(list1), max(list2))
-    return (min_value, max_value)
