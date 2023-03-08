@@ -61,13 +61,14 @@ def chain_unanchored_snippets(T, unanchored_chain, m, d, title):
     plt.suptitle(title + ' (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
     return plt
 
-def chain_elbowplot(max_distances: list, ds: list, title: str):
+def chain_elbowplot(max_distances: list, ds: list, y_lim: tuple, title: str):
     plt.figure(figsize=(8,4))
     plt.plot(ds, max_distances, 'bx-')
     plt.xlabel('d')
     plt.ylabel('Max Distance')
     plt.title(title)
     plt.xticks(range(1,ds[-1]+1))
+    plt.ylim(y_lim[0] - 50, y_lim[1] + 50)
     return plt
 
 def segmentation_regimecac(T, m, d, L, n_regimes, excl_factor, mp, cac, regime_locations):

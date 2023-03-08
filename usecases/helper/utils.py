@@ -36,3 +36,8 @@ def _set_best_chain(current_longest_chain, new_chain):
     elif len(new_chain) == len(current_longest_chain) and new_chain[0] < current_longest_chain[0]:
         return new_chain
     return current_longest_chain
+
+def get_min_max_from_lists(list1, list2) -> tuple:
+    min_value = min(min(list1), min(list2))
+    max_value = max(max(list1), max(list2))
+    return (min_value, max_value)
