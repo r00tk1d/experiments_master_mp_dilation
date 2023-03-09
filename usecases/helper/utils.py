@@ -3,14 +3,28 @@ import os
 
 
 def calculate_dilation_sizes(target_w):
+    """ Calculates all dilation sizes to get a target range w 
+    with the constraint that each dilation size d needs to be 
+    smaller than the number of values m
+
+    Parameters
+    ----------
+    target_w: int
+        target range for the subsequence
+
+    Returns
+    -------
+    dilation_sizes: list
+        list of possible dilation sizes
+    """
     d = 1
-    ds = []
+    dilation_sizes = []
     m = round((target_w-1)/d) + 1
     while d < m:
-        ds.append(d)
+        dilation_sizes.append(d)
         d += 1
         m = round((target_w-1)/d) + 1
-    return ds
+    return dilation_sizes
 
 def get_min_max_from_lists(list1, list2) -> tuple:
     min_value = min(min(list1), min(list2))

@@ -7,8 +7,11 @@ from . import results
 from . import utils
 
 def chains(ds, target_w, data_name, use_case):
+    plt.rcParams.update({'figure.max_open_warning': 0})
+
     max_distances_unanchored_chains = []
     max_distances_non_overlapping_unanchored_chains = []
+    
     for d in ds:
         m = round((target_w-1)/d) + 1
         file_name = data_name + "_d" + str(d) + "_m" + str(m)
