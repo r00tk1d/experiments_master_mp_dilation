@@ -310,4 +310,4 @@ def load_from_csv(path: str, column: str) -> npt.NDArray[np.float64]:
 ### .mat ###
 def load_from_mat(path: str, column: str) -> npt.NDArray[np.float64]:
     mat_contents = loadmat(path)
-    return [x[0] for x in mat_contents[column]]
+    return np.array([x[0] for x in mat_contents[column]]).astype(np.float64)
