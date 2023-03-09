@@ -7,7 +7,7 @@ def chains(T, ds, target_w, data_name, use_case):
         m = round((target_w-1)/d) + 1
         actual_w = (m-1)*d + 1
         file_name =  data_name + "_d" + str(d) + "_m" + str(m)
-        file_path = "../results/" + use_case + "/" + data_name + "/" + file_name
+        file_path = "../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + file_name
 
         if d == 1:
             mp = stumpy.stump(T, m=m)

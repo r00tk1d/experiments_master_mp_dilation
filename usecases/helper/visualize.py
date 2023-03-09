@@ -11,11 +11,11 @@ def chains(ds, target_w, data_name, use_case):
 
     max_distances_unanchored_chains = []
     max_distances_non_overlapping_unanchored_chains = []
-    
+
     for d in ds:
         m = round((target_w-1)/d) + 1
         file_name = data_name + "_d" + str(d) + "_m" + str(m)
-        file_path = "../results/" + use_case + "/" + data_name + "/" + file_name
+        file_path = "../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + file_name
 
         T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, max_distance_in_unanchored_chain, max_distance_in_non_overlapping_unanchored_chain = results.load(file_path + ".npy")
 
@@ -37,9 +37,9 @@ def chains(ds, target_w, data_name, use_case):
     # elbow plot for ds
     y_lim = utils.get_min_max_from_lists(max_distances_unanchored_chains, max_distances_non_overlapping_unanchored_chains)
     plot = _chain_elbowplot(max_distances_unanchored_chains, ds, y_lim, "Elbow Plot Unanchored Chains")
-    plot.savefig("../results/" + use_case + "/" + data_name + "/" + data_name + "_elbowplot")
+    plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_elbowplot")
     plot = _chain_elbowplot(max_distances_non_overlapping_unanchored_chains, ds, y_lim, "Elbow Plot Non Overlapping Unanchored Chains")
-    plot.savefig("../results/" + use_case + "/" + data_name + "/" + data_name + "_non_overlapping_elbowplot")
+    plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_non_overlapping_elbowplot")
 
 def _discord(T, m, d, mp, discord_idx):
     w = ((m-1)*d + 1)

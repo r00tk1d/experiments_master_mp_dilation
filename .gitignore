@@ -1,3 +1,4 @@
 __pycache__/
 .vscode
 UCRArchive_2018
+.pytest_cache
