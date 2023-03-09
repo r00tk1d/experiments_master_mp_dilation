@@ -3,7 +3,7 @@ import numpy.typing as npt
 import numpy as np
 
 from numpy import loadtxt
-from pandas import read_csv
+import pandas as pd
 from scipy.io import loadmat
 
 ### UCR .tsv ###
@@ -305,7 +305,7 @@ def load_from_txt(path: str) -> npt.NDArray[np.float64]:
 
 ### .csv ###
 def load_from_csv(path: str, column: str) -> npt.NDArray[np.float64]:
-    return read_csv(path)[column].to_numpy()
+    return pd.read_csv(path, sep='\t', lineterminator='\r', header=None)[5].to_numpy(dtype=np.float64)
 
 ### .mat ###
 def load_from_mat(path: str, column: str) -> npt.NDArray[np.float64]:
