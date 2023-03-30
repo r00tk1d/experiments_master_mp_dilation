@@ -24,10 +24,28 @@ def chains(T, ds, target_w, data_name, use_case):
         length_unanchored_chain = unanchored_chain[-1] - unanchored_chain[0]
         length_non_overlapping_unanchored_chain = non_overlapping_unanchored_chain[-1] - non_overlapping_unanchored_chain[0]
 
-        results.save([T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, length_unanchored_chain, length_non_overlapping_unanchored_chain], file_path + ".npy")
+        unanchored_chain_score = _chain_score(unanchored_chain)
+        non_overlapping_unanchored_chain_score = _chain_score(non_overlapping_unanchored_chain)
 
-def chain_score(chain):
-    return effective_length, correlation_length
+        results.save([T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score], file_path + ".npy")
+
+def _chain_score(chain):
+    # effective length
+    chain_length = chain[-1] - chain[0]
+    max_distance_between_pairs = max(chain[i+1] - chain[i] for i in range(len(chain)-1))
+    effective_length = round(chain_length / max_distance_between_pairs)
+
+    # correlation length
+    corr_lengths = []
+    for i in range(len(chain)-1):
+        corr = np.corrcoef(chain[i], chain[i+1])[0,1]
+        corr_lengths.append(abs(corr) * corr)
+    correlation_length = sum(corr_lengths)
+
+    # length
+    length = chain[-1] - chain[0]
+
+    return effective_length, correlation_length, length
 
 
 def segmentation_fluss_known_cps(T, T_name, cps, ds, target_w, L, n_regimes):

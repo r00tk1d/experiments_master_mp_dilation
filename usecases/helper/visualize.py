@@ -17,10 +17,10 @@ def chains(ds, target_w, data_name, use_case):
         file_name = data_name + "_d" + str(d) + "_m" + str(m)
         file_path = "../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + file_name
 
-        T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, length_unanchored_chain, length_overlapping_unanchored_chain = results.load(file_path + ".npy")
+        T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score = results.load(file_path + ".npy")
 
-        lengths_unanchored_chains.append(length_unanchored_chain)
-        lengths_non_overlapping_unanchored_chains.append(length_overlapping_unanchored_chain)
+        lengths_unanchored_chains.append(unanchored_chain_score[2])
+        lengths_non_overlapping_unanchored_chains.append(non_overlapping_unanchored_chain_score[2])
         
         # unanchored chain
         plot = _chain_unanchored(T, unanchored_chain, m, d, "Unanchored Chain")
