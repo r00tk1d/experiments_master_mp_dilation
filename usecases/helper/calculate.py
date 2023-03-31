@@ -24,28 +24,48 @@ def chains(T, ds, target_w, data_name, use_case):
         length_unanchored_chain = unanchored_chain[-1] - unanchored_chain[0]
         length_non_overlapping_unanchored_chain = non_overlapping_unanchored_chain[-1] - non_overlapping_unanchored_chain[0]
 
-        unanchored_chain_score = _chain_score(unanchored_chain)
-        non_overlapping_unanchored_chain_score = _chain_score(non_overlapping_unanchored_chain)
+        unanchored_chain_score = _chain_score(unanchored_chain, T, d, m)
+        non_overlapping_unanchored_chain_score = _chain_score(non_overlapping_unanchored_chain, T, d, m)
 
         results.save([T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score], file_path + ".npy")
 
-def _chain_score(chain):
-    # effective length
-    chain_length = chain[-1] - chain[0]
-    max_distance_between_pairs = max(chain[i+1] - chain[i] for i in range(len(chain)-1))
-    effective_length = round(chain_length / max_distance_between_pairs)
+def _chain_score(chain, T, d, m):
+    T_norm = (T - np.mean(T)) / np.std(T)
 
-    # correlation length
+    # obtain subseqeunces
+    subsequences = []
+    for start_idx in chain:
+        stop_idx = start_idx + (m-1)*d + 1
+        subsequence = T_norm[start_idx:stop_idx:d]
+        subsequences.append(subsequence)
+    
+
+    # length (number of nodes)
+    chain_length = len(chain)
+
+
+    # effective length (the greater the better) (considers divergence and graduality)
+    distances = []
+    for i in range(len(subsequences)-1):
+        distance = np.linalg.norm(subsequence[i]-subsequence[i+1])
+        distances.append(distance)
+    max_distance_between_nodes = max(distances)
+    # distances = np.linalg.norm(subsequences[:-1] - subsequences[1:], axis=1)
+
+    distance_first_last_node = np.linalg.norm(subsequence[0]-subsequence[-1])
+    effective_length = round(distance_first_last_node / max_distance_between_nodes)
+
+    # correlation length (the greater the better) (considers similarity of consecutive subsequences)
     corr_lengths = []
-    for i in range(len(chain)-1):
-        corr = np.corrcoef(chain[i], chain[i+1])[0,1]
+    for i in range(len(subsequences)-1):
+        corr = np.corrcoef(subsequences[i], subsequences[i+1])[0,1]
         corr_lengths.append(abs(corr) * corr)
     correlation_length = sum(corr_lengths)
 
-    # length
-    length = chain[-1] - chain[0]
-
-    return effective_length, correlation_length, length
+    return {"Length": chain_length,
+            "Effective Length": effective_length,
+            "Correlation Length": correlation_length,
+            }
 
 
 def segmentation_fluss_known_cps(T, T_name, cps, ds, target_w, L, n_regimes):
