@@ -47,12 +47,11 @@ def _chain_score(chain, T, d, m):
     # effective length (the greater the better) (considers divergence and graduality)
     distances = []
     for i in range(len(subsequences)-1):
-        distance = np.linalg.norm(subsequence[i]-subsequence[i+1])
+        distance = np.linalg.norm(subsequences[i]-subsequences[i+1])
         distances.append(distance)
     max_distance_between_nodes = max(distances)
-    # distances = np.linalg.norm(subsequences[:-1] - subsequences[1:], axis=1)
 
-    distance_first_last_node = np.linalg.norm(subsequence[0]-subsequence[-1])
+    distance_first_last_node = np.linalg.norm(subsequences[0]-subsequences[-1])
     effective_length = round(distance_first_last_node / max_distance_between_nodes)
 
     # correlation length (the greater the better) (considers similarity of consecutive subsequences)

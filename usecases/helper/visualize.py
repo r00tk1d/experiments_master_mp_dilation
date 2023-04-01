@@ -37,31 +37,32 @@ def chains(ds, target_w, data_name, use_case):
     # elbow plot for ds length
     lengths_unanchored_chains = [i["Length"] for i in unanchored_chain_scores]
     lengths_non_overlapping_unanchored_chains = [i["Length"] for i in non_overlapping_unanchored_chain_scores]
-    y_lim = utils.get_min_max_from_lists(lengths_unanchored_chains, lengths_non_overlapping_unanchored_chains)
-    plot = _chain_elbowplot(lengths_unanchored_chains, ds, y_lim, "Length Unanchored Chains")
+    # y_lim = utils.get_min_max_from_lists(lengths_unanchored_chains, lengths_non_overlapping_unanchored_chains)
+    y_lim = (0, max(max(lengths_unanchored_chains), max(lengths_non_overlapping_unanchored_chains)))
+    plot = _chain_elbowplot(lengths_unanchored_chains, ds, y_lim, "Length Chain")
     plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_elbowplot_length")
-    plot = _chain_elbowplot(lengths_non_overlapping_unanchored_chains, ds, y_lim, "Length Non Overlapping Unanchored Chains")
+    plot = _chain_elbowplot(lengths_non_overlapping_unanchored_chains, ds, y_lim, "Length Non Overlapping Chain")
     plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_non_overlapping_elbowplot_length")
-
-    # elbow plot for ds correlation length
-    correlation_lengths_unanchored_chains = [i["Correlation Length"] for i in unanchored_chain_scores]
-    correlation_lengths_non_overlapping_unanchored_chains = [i["Correlation Length"] for i in non_overlapping_unanchored_chain_scores]
-    y_lim = utils.get_min_max_from_lists(correlation_lengths_unanchored_chains, correlation_lengths_non_overlapping_unanchored_chains)
-    plot = _chain_elbowplot(correlation_lengths_unanchored_chains, ds, y_lim, "Correlation Length Unanchored Chains")
-    plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_elbowplot_correlation_length")
-    plot = _chain_elbowplot(correlation_lengths_non_overlapping_unanchored_chains, ds, y_lim, "Correlation Length Non Overlapping Unanchored Chain")
-    plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_non_overlapping_elbowplot_correlation_length")
 
     # elbow plot for ds effective length
     effective_lengths_unanchored_chains = [i["Effective Length"] for i in unanchored_chain_scores]
     effective_lengths_non_overlapping_unanchored_chains = [i["Effective Length"] for i in non_overlapping_unanchored_chain_scores]
-    y_lim = utils.get_min_max_from_lists(effective_lengths_unanchored_chains, effective_lengths_non_overlapping_unanchored_chains)
-    plot = _chain_elbowplot(effective_lengths_unanchored_chains, ds, y_lim, "Effective Length Unanchored Chain")
+    # y_lim = utils.get_min_max_from_lists(effective_lengths_unanchored_chains, effective_lengths_non_overlapping_unanchored_chains)
+    y_lim = (0, max(max(effective_lengths_unanchored_chains), max(effective_lengths_non_overlapping_unanchored_chains)))
+    plot = _chain_elbowplot(effective_lengths_unanchored_chains, ds, y_lim, "Effective Length Chain")
     plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_elbowplot_effective_length")
-    plot = _chain_elbowplot(effective_lengths_non_overlapping_unanchored_chains, ds, y_lim, "Effective Length Non Overlapping Unanchored Chain")
+    plot = _chain_elbowplot(effective_lengths_non_overlapping_unanchored_chains, ds, y_lim, "Effective Length Non Overlapping Chain")
     plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_non_overlapping_elbowplot_effective_length")
 
-
+    # elbow plot for ds correlation length
+    correlation_lengths_unanchored_chains = [i["Correlation Length"] for i in unanchored_chain_scores]
+    correlation_lengths_non_overlapping_unanchored_chains = [i["Correlation Length"] for i in non_overlapping_unanchored_chain_scores]
+    # y_lim = utils.get_min_max_from_lists(correlation_lengths_unanchored_chains, correlation_lengths_non_overlapping_unanchored_chains)
+    y_lim = (0, max(max(correlation_lengths_unanchored_chains), max(correlation_lengths_non_overlapping_unanchored_chains)))
+    plot = _chain_elbowplot(correlation_lengths_unanchored_chains, ds, y_lim, "Correlation Length Chain")
+    plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_elbowplot_correlation_length")
+    plot = _chain_elbowplot(correlation_lengths_non_overlapping_unanchored_chains, ds, y_lim, "Correlation Length Non Overlapping Chain")
+    plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_non_overlapping_elbowplot_correlation_length")
     
 
 def _discord(T, m, d, mp, discord_idx):
