@@ -43,7 +43,6 @@ def _chain_score(chain, T, d, m):
     # length (number of nodes)
     chain_length = len(chain)
 
-
     # effective length (the greater the better) (considers divergence and graduality)
     distances = []
     for i in range(len(subsequences)-1):
