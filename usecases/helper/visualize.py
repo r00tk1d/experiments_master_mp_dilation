@@ -17,7 +17,7 @@ def chains(ds, target_w, data_name, use_case):
         file_name = data_name + "_d" + str(d) + "_m" + str(m)
         file_path = "../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + file_name
 
-        T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score = results.load(file_path + ".npy")
+        T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score, ground_truth = results.load(file_path + ".npy")
 
         unanchored_chain_scores.append(unanchored_chain_score)
         non_overlapping_unanchored_chain_scores.append(non_overlapping_unanchored_chain_score)
@@ -35,9 +35,8 @@ def chains(ds, target_w, data_name, use_case):
         plot.savefig(file_path + "_non_overlapping_unanchored_snippets")
 
     # elbow plot for ds length
-    lengths_unanchored_chains = [i["Length"] for i in unanchored_chain_scores]
-    lengths_non_overlapping_unanchored_chains = [i["Length"] for i in non_overlapping_unanchored_chain_scores]
-    # y_lim = utils.get_min_max_from_lists(lengths_unanchored_chains, lengths_non_overlapping_unanchored_chains)
+    lengths_unanchored_chains = [score["Length"] for score in unanchored_chain_scores]
+    lengths_non_overlapping_unanchored_chains = [score["Length"] for score in non_overlapping_unanchored_chain_scores]
     y_lim = (0, max(max(lengths_unanchored_chains), max(lengths_non_overlapping_unanchored_chains)))
     plot = _chain_elbowplot(lengths_unanchored_chains, ds, y_lim, "Length Chain")
     plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_elbowplot_length")
@@ -45,9 +44,8 @@ def chains(ds, target_w, data_name, use_case):
     plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_non_overlapping_elbowplot_length")
 
     # elbow plot for ds effective length
-    effective_lengths_unanchored_chains = [i["Effective Length"] for i in unanchored_chain_scores]
-    effective_lengths_non_overlapping_unanchored_chains = [i["Effective Length"] for i in non_overlapping_unanchored_chain_scores]
-    # y_lim = utils.get_min_max_from_lists(effective_lengths_unanchored_chains, effective_lengths_non_overlapping_unanchored_chains)
+    effective_lengths_unanchored_chains = [score["Effective Length"] for score in unanchored_chain_scores]
+    effective_lengths_non_overlapping_unanchored_chains = [score["Effective Length"] for score in non_overlapping_unanchored_chain_scores]
     y_lim = (0, max(max(effective_lengths_unanchored_chains), max(effective_lengths_non_overlapping_unanchored_chains)))
     plot = _chain_elbowplot(effective_lengths_unanchored_chains, ds, y_lim, "Effective Length Chain")
     plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_elbowplot_effective_length")
@@ -55,14 +53,41 @@ def chains(ds, target_w, data_name, use_case):
     plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_non_overlapping_elbowplot_effective_length")
 
     # elbow plot for ds correlation length
-    correlation_lengths_unanchored_chains = [i["Correlation Length"] for i in unanchored_chain_scores]
-    correlation_lengths_non_overlapping_unanchored_chains = [i["Correlation Length"] for i in non_overlapping_unanchored_chain_scores]
-    # y_lim = utils.get_min_max_from_lists(correlation_lengths_unanchored_chains, correlation_lengths_non_overlapping_unanchored_chains)
+    correlation_lengths_unanchored_chains = [score["Correlation Length"] for score in unanchored_chain_scores]
+    correlation_lengths_non_overlapping_unanchored_chains = [score["Correlation Length"] for score in non_overlapping_unanchored_chain_scores]
     y_lim = (0, max(max(correlation_lengths_unanchored_chains), max(correlation_lengths_non_overlapping_unanchored_chains)))
     plot = _chain_elbowplot(correlation_lengths_unanchored_chains, ds, y_lim, "Correlation Length Chain")
     plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_elbowplot_correlation_length")
     plot = _chain_elbowplot(correlation_lengths_non_overlapping_unanchored_chains, ds, y_lim, "Correlation Length Non Overlapping Chain")
     plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_non_overlapping_elbowplot_correlation_length")
+
+    if ground_truth:
+        # elbow plot for ds recall
+        recall_unanchored_chains = [score["Recall"] for score in unanchored_chain_scores]
+        recall_non_overlapping_unanchored_chains = [score["Recall"] for score in non_overlapping_unanchored_chain_scores]
+        y_lim = (0, max(max(recall_unanchored_chains), max(recall_non_overlapping_unanchored_chains)))
+        plot = _chain_elbowplot(recall_unanchored_chains, ds, y_lim, "Recall Chain")
+        plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_elbowplot_recall")
+        plot = _chain_elbowplot(recall_non_overlapping_unanchored_chains, ds, y_lim, "Recall Non Overlapping Chain")
+        plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_non_overlapping_elbowplot_recall")
+
+        # elbow plot for ds precision
+        precision_unanchored_chains = [score["Precision"] for score in unanchored_chain_scores]
+        precision_non_overlapping_unanchored_chains = [score["Precision"] for score in non_overlapping_unanchored_chain_scores]
+        y_lim = (0, max(max(precision_unanchored_chains), max(precision_non_overlapping_unanchored_chains)))
+        plot = _chain_elbowplot(precision_unanchored_chains, ds, y_lim, "Precision Chain")
+        plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_elbowplot_precision")
+        plot = _chain_elbowplot(precision_non_overlapping_unanchored_chains, ds, y_lim, "Precision Non Overlapping Chain")
+        plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_non_overlapping_elbowplot_precision")
+
+        # elbow plot for ds f1 score
+        f1_unanchored_chains = [score["F1-Score"] for score in unanchored_chain_scores]
+        f1_non_overlapping_unanchored_chains = [score["F1-Score"] for score in non_overlapping_unanchored_chain_scores]
+        y_lim = (0, max(max(f1_unanchored_chains), max(f1_non_overlapping_unanchored_chains)))
+        plot = _chain_elbowplot(f1_unanchored_chains, ds, y_lim, "F1-Score Chain")
+        plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_elbowplot_f1")
+        plot = _chain_elbowplot(f1_non_overlapping_unanchored_chains, ds, y_lim, "F1-Score Non Overlapping Chain")
+        plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_non_overlapping_elbowplot_f1")
     
 
 def _discord(T, m, d, mp, discord_idx):

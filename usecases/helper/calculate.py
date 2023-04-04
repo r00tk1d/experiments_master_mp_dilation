@@ -4,9 +4,9 @@ from . import utils
 from tssb.evaluation import covering
 import numpy as np
 import copy
+import math
 
-
-def chains(T, ds, target_w, data_name, use_case):
+def chains(T, ds, target_w, data_name, use_case, ground_truth = None):
     for d in ds:
         m = round((target_w-1)/d) + 1
         actual_w = (m-1)*d + 1
@@ -24,45 +24,69 @@ def chains(T, ds, target_w, data_name, use_case):
         length_unanchored_chain = unanchored_chain[-1] - unanchored_chain[0]
         length_non_overlapping_unanchored_chain = non_overlapping_unanchored_chain[-1] - non_overlapping_unanchored_chain[0]
 
-        unanchored_chain_score = _chain_score(unanchored_chain, T, d, m)
-        non_overlapping_unanchored_chain_score = _chain_score(non_overlapping_unanchored_chain, T, d, m)
+        unanchored_chain_score = _chain_score(unanchored_chain, T, d, m, ground_truth)
+        non_overlapping_unanchored_chain_score = _chain_score(non_overlapping_unanchored_chain, T, d, m, ground_truth)
 
-        results.save([T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score], file_path + ".npy")
+        results.save([T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score, ground_truth], file_path + ".npy")
 
-def _chain_score(chain, T, d, m):
+def _chain_score(chain, T, d, m, ground_truth = None):
     T_norm = (T - np.mean(T)) / np.std(T)
 
-    # obtain subseqeunces
-    subsequences = []
+    # obtain chain subsequences
+    w = (m-1)*d + 1
+    chain_subsequences = []
     for start_idx in chain:
-        stop_idx = start_idx + (m-1)*d + 1
+        stop_idx = start_idx + w
         subsequence = T_norm[start_idx:stop_idx:d]
-        subsequences.append(subsequence)
-    
+        chain_subsequences.append(subsequence)
 
     # length (number of nodes)
     chain_length = len(chain)
 
     # effective length (the greater the better) (considers divergence and graduality)
     distances = []
-    for i in range(len(subsequences)-1):
-        distance = np.linalg.norm(subsequences[i]-subsequences[i+1])
+    for i in range(len(chain_subsequences)-1):
+        distance = np.linalg.norm(chain_subsequences[i]-chain_subsequences[i+1])
         distances.append(distance)
     max_distance_between_nodes = max(distances)
 
-    distance_first_last_node = np.linalg.norm(subsequences[0]-subsequences[-1])
+    distance_first_last_node = np.linalg.norm(chain_subsequences[0]-chain_subsequences[-1])
     effective_length = round(distance_first_last_node / max_distance_between_nodes)
 
     # correlation length (the greater the better) (considers similarity of consecutive subsequences)
     corr_lengths = []
-    for i in range(len(subsequences)-1):
-        corr = np.corrcoef(subsequences[i], subsequences[i+1])[0,1]
+    for i in range(len(chain_subsequences)-1):
+        corr = np.corrcoef(chain_subsequences[i], chain_subsequences[i+1])[0,1]
         corr_lengths.append(abs(corr) * corr)
     correlation_length = sum(corr_lengths)
+
+    # Recall and Precision (a hit is if overlap is > 50%)
+    recall = None
+    precision = None
+    f1 = None
+    if ground_truth:
+        n_hits = 0
+        for start_idx in chain:
+            closest_ground_truth = min(ground_truth, key=lambda x:abs(x-start_idx))
+            if start_idx == closest_ground_truth:
+                n_hits += 1
+            elif start_idx < closest_ground_truth and start_idx + math.ceil(w/2) > closest_ground_truth:
+                n_hits += 1
+            elif start_idx > closest_ground_truth and start_idx - math.ceil(w/2) < closest_ground_truth:
+                n_hits += 1
+        recall = n_hits / len(ground_truth)
+        precision = n_hits / len(chain)
+        if precision+recall == 0:
+            f1 = -1
+        else:
+            f1 = (2*precision*recall)/(precision+recall)
 
     return {"Length": chain_length,
             "Effective Length": effective_length,
             "Correlation Length": correlation_length,
+            "Recall": recall,
+            "Precision": precision,
+            "F1-Score": f1
             }
 
 
