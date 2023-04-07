@@ -90,10 +90,17 @@ def _chain_score(chain, T, d, m, ground_truth = None):
             }
 
 
-def segmentation_fluss_known_cps(T, T_name, cps, ds, target_w, L, n_regimes):
+def segmentation_fluss_known_cps(T, T_name, cps, ds, L, n_regimes, target_w, m):
+    assert (target_w is None) != (m is None)
+    if target_w:
+        calculate_m = True
+    else:
+        calculate_m = False
+    
     scores = []
     for d in ds:
-        m = round((target_w-1)/d) + 1
+        if calculate_m:
+            m = round((target_w-1)/d) + 1
         actual_w = (m-1)*d + 1
 
         if d == 1:
@@ -108,10 +115,17 @@ def segmentation_fluss_known_cps(T, T_name, cps, ds, target_w, L, n_regimes):
     return scores
 
 
-def segmentation_fluss_unknown_cps(T, T_name, cps, ds, target_w, L, threshold):
+def segmentation_fluss_unknown_cps(T, T_name, cps, ds, L, threshold, target_w, m):
+    assert (target_w is None) != (m is None)
+    if target_w:
+        calculate_m = True
+    else:
+        calculate_m = False
+    
     scores = []
     for d in ds:
-        m = round((target_w-1)/d) + 1
+        if calculate_m:
+            m = round((target_w-1)/d) + 1
         actual_w = (m-1)*d + 1
 
         if d == 1:
@@ -127,7 +141,7 @@ def segmentation_fluss_unknown_cps(T, T_name, cps, ds, target_w, L, threshold):
         scores.append(score)
     return scores
 
-
+# uses a threshold to determine the cps
 def _rea_unknown_cps(cac, L, threshold, excl_factor=5):
     found_cps = []
     tmp_cac = copy.deepcopy(cac)
