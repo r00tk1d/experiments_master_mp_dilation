@@ -6,32 +6,33 @@ from matplotlib.patches import Rectangle
 from . import results
 from . import utils
 
-def chains(ds, target_w, data_name, use_case):
+def chains(max_dilation, target_w, data_name, use_case, offset = False):
     plt.rcParams.update({'figure.max_open_warning': 0})
 
     unanchored_chain_scores = []
     non_overlapping_unanchored_chain_scores = []
+    ds = [d for d in range(1, max_dilation+1)]
 
     for d in ds:
         m = round((target_w-1)/d) + 1
         file_name = data_name + "_d" + str(d) + "_m" + str(m)
-        file_path = "../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + file_name
+        file_path = f"../results/{use_case}/{data_name}/target_w{target_w}" + (f"_with_offset" if offset else "") + f"/{file_name}"
 
-        T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score, ground_truth = results.load(file_path + ".npy")
+        result = results.load(file_path + ".npy")
 
-        unanchored_chain_scores.append(unanchored_chain_score)
-        non_overlapping_unanchored_chain_scores.append(non_overlapping_unanchored_chain_score)
+        unanchored_chain_scores.append(result.unanchored_chain_score)
+        non_overlapping_unanchored_chain_scores.append(result.non_overlapping_unanchored_chain_score)
         
         # unanchored chain
-        plot = _chain_unanchored(T, unanchored_chain, m, d, "Unanchored Chain")
+        plot = _chain_unanchored(result.T, result.unanchored_chain, m, d, "Unanchored Chain")
         plot.savefig(file_path + "_unanchored")
-        plot = _chain_unanchored_snippets(T, unanchored_chain, m, d, "Unanchored Chain")
+        plot = _chain_unanchored_snippets(result.T, result.unanchored_chain, m, d, "Unanchored Chain")
         plot.savefig(file_path + "_unanchored_snippets")
 
         # non overlapping unanchored chain
-        plot = _chain_unanchored(T, non_overlapping_unanchored_chain, m, d, "Non Overlapping Unanchored Chain")
+        plot = _chain_unanchored(result.T, result.non_overlapping_unanchored_chain, m, d, "Non Overlapping Unanchored Chain")
         plot.savefig(file_path + "_non_overlapping_unanchored")
-        plot = _chain_unanchored_snippets(T, non_overlapping_unanchored_chain, m, d, "Non Overlapping Unanchored Chain")
+        plot = _chain_unanchored_snippets(result.T, result.non_overlapping_unanchored_chain, m, d, "Non Overlapping Unanchored Chain")
         plot.savefig(file_path + "_non_overlapping_unanchored_snippets")
 
     # elbow plot for ds length
@@ -61,7 +62,7 @@ def chains(ds, target_w, data_name, use_case):
     plot = _chain_elbowplot(correlation_lengths_non_overlapping_unanchored_chains, ds, y_lim, "Correlation Length Non Overlapping Chain")
     plot.savefig("../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + data_name + "_non_overlapping_elbowplot_correlation_length")
 
-    if ground_truth:
+    if result.ground_truth:
         # elbow plot for ds recall
         recall_unanchored_chains = [score["Recall"] for score in unanchored_chain_scores]
         recall_non_overlapping_unanchored_chains = [score["Recall"] for score in non_overlapping_unanchored_chain_scores]

@@ -1,6 +1,20 @@
+from typing import NamedTuple
 import numpy as np
 import os
 
+class Result(NamedTuple):
+    T: np.ndarray
+    m: int
+    d: int
+    mp: np.ndarray
+    all_chain_set: np.ndarray
+    all_non_overlapping_chain_set: np.ndarray
+    unanchored_chain: np.ndarray
+    non_overlapping_unanchored_chain: np.ndarray
+    unanchored_chain_score: dict
+    non_overlapping_unanchored_chain_score: dict
+    ground_truth: np.ndarray
+    offset_start: int
 
 def save(np_arrays: list, file_path):
     result = np.array(np_arrays, dtype=object)
@@ -10,6 +24,6 @@ def save(np_arrays: list, file_path):
     np.save(file_path, result, allow_pickle=True)
         
 
-def load(file_path):
+def load(file_path) -> Result:
     result = np.load(file_path, allow_pickle=True)
-    return tuple(result)
+    return Result(*tuple(result))

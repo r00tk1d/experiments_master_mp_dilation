@@ -6,7 +6,7 @@ import numpy as np
 import copy
 import math
 
-def chains(T, ds, target_w, data_name, use_case, ground_truth = None):
+def chains_old(T, ds, target_w, data_name, use_case, ground_truth = None):
     for d in ds:
         m = round((target_w-1)/d) + 1
         actual_w = (m-1)*d + 1
@@ -21,13 +21,49 @@ def chains(T, ds, target_w, data_name, use_case, ground_truth = None):
         all_chain_set, unanchored_chain = stumpy.allc(mp[:, 2], mp[:, 3])
         all_non_overlapping_chain_set, non_overlapping_unanchored_chain = utils.remove_overlapping_chains(all_chain_set, m, d)
 
-        length_unanchored_chain = unanchored_chain[-1] - unanchored_chain[0]
-        length_non_overlapping_unanchored_chain = non_overlapping_unanchored_chain[-1] - non_overlapping_unanchored_chain[0]
+        # length_unanchored_chain = unanchored_chain[-1] - unanchored_chain[0]
+        # length_non_overlapping_unanchored_chain = non_overlapping_unanchored_chain[-1] - non_overlapping_unanchored_chain[0]
 
         unanchored_chain_score = _chain_score(unanchored_chain, T, d, m, ground_truth)
         non_overlapping_unanchored_chain_score = _chain_score(non_overlapping_unanchored_chain, T, d, m, ground_truth)
 
         results.save([T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score, ground_truth], file_path + ".npy")
+
+def chains(T, max_dilation, target_w, data_name, use_case, ground_truth = None, offset = False):
+    """
+    Calculates the chains for a given time series {T} and a given list of dilations {ds}.
+    The chains are calculated for a given target window range {target_w}.
+    If offset is set to true, the chains with a dilation size above 1 are calculated with an offset determined by the starting point of the unanchored chain without dilation.
+    """
+    offset_start = 0
+    for d in range(1, max_dilation+1):
+        m = round((target_w-1)/d) + 1
+        actual_w = (m-1)*d + 1
+        file_name = data_name + "_d" + str(d) + "_m" + str(m)
+        file_path = f"../results/{use_case}/{data_name}/target_w{target_w}" + (f"_with_offset" if offset else "") + f"/{file_name}"
+
+        if d == 1:
+            mp = stumpy.stump(T, m=m)
+        else:
+            mp = stumpy.stump_dil(T[offset_start:], m=m, d=d)
+        print("Calculated MP for: w=" + str(actual_w) + ", m=" + str(m) + ", d=" + str(d) + ", offset=" + str(offset_start))
+
+        all_chain_set, unanchored_chain = stumpy.allc(mp[:, 2], mp[:, 3])
+        unanchored_chain = np.array([x + offset_start for x in unanchored_chain])
+
+        all_non_overlapping_chain_set, non_overlapping_unanchored_chain = utils.remove_overlapping_chains(all_chain_set, m, d)
+        non_overlapping_unanchored_chain = np.array([x + offset_start for x in non_overlapping_unanchored_chain])
+
+        # length_unanchored_chain = unanchored_chain[-1] - unanchored_chain[0]
+        # length_non_overlapping_unanchored_chain = non_overlapping_unanchored_chain[-1] - non_overlapping_unanchored_chain[0]
+
+        unanchored_chain_score = _chain_score(unanchored_chain, T, d, m, ground_truth)
+        non_overlapping_unanchored_chain_score = _chain_score(non_overlapping_unanchored_chain, T, d, m, ground_truth)
+
+        results.save([T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score, ground_truth, offset_start], file_path + ".npy")
+
+        if offset and d==1:
+            offset_start = unanchored_chain[0]
 
 def _chain_score(chain, T, d, m, ground_truth = None):
     T_norm = (T - np.mean(T)) / np.std(T)
