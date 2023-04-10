@@ -1,3 +1,4 @@
+from typing import NamedTuple
 import stumpy
 from . import results
 from . import utils
@@ -5,6 +6,14 @@ from tssb.evaluation import covering
 import numpy as np
 import copy
 import math
+
+class ChainScore(NamedTuple):
+    length: int
+    effective_length: int
+    correlation_length: float
+    recall: float
+    precision: float
+    f1_score: float
 
 def chains_old(T, ds, target_w, data_name, use_case, ground_truth = None):
     for d in ds:
@@ -29,11 +38,11 @@ def chains_old(T, ds, target_w, data_name, use_case, ground_truth = None):
 
         results.save([T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score, ground_truth], file_path + ".npy")
 
-def chains(T, max_dilation, target_w, data_name, use_case, ground_truth = None, offset = False):
+def chains(T, max_dilation, target_w, data_name, use_case, ground_truth, offset):
     """
     Calculates the chains for a given time series {T} and a given list of dilations {ds}.
     The chains are calculated for a given target window range {target_w}.
-    If offset is set to true, the chains with a dilation size above 1 are calculated with an offset determined by the starting point of the unanchored chain without dilation.
+    If offset is set to true, the chains with a dilation size above 1 are calculated with an offset determined by the starting point of the unanchored chain without dilation. The ground truth is then set to the unanchored chain without dilation.
     """
     offset_start = 0
     for d in range(1, max_dilation+1):
@@ -57,6 +66,9 @@ def chains(T, max_dilation, target_w, data_name, use_case, ground_truth = None, 
         # length_unanchored_chain = unanchored_chain[-1] - unanchored_chain[0]
         # length_non_overlapping_unanchored_chain = non_overlapping_unanchored_chain[-1] - non_overlapping_unanchored_chain[0]
 
+        if not ground_truth and d==1:
+            ground_truth = list(unanchored_chain)
+
         unanchored_chain_score = _chain_score(unanchored_chain, T, d, m, ground_truth)
         non_overlapping_unanchored_chain_score = _chain_score(non_overlapping_unanchored_chain, T, d, m, ground_truth)
 
@@ -65,7 +77,7 @@ def chains(T, max_dilation, target_w, data_name, use_case, ground_truth = None, 
         if offset and d==1:
             offset_start = unanchored_chain[0]
 
-def _chain_score(chain, T, d, m, ground_truth = None):
+def _chain_score(chain, T, d, m, ground_truth = None) -> ChainScore:
     T_norm = (T - np.mean(T)) / np.std(T)
 
     # obtain chain subsequences
@@ -96,34 +108,26 @@ def _chain_score(chain, T, d, m, ground_truth = None):
         corr_lengths.append(abs(corr) * corr)
     correlation_length = sum(corr_lengths)
 
-    # Recall and Precision (a hit is if overlap is > 50%)
+    # Recall, Precision, F1 Score (a hit is if overlap is > 50%)
     recall = None
     precision = None
     f1 = None
-    if ground_truth:
-        n_hits = 0
-        for start_idx in chain:
-            closest_ground_truth = min(ground_truth, key=lambda x:abs(x-start_idx))
-            if start_idx == closest_ground_truth:
-                n_hits += 1
-            elif start_idx < closest_ground_truth and start_idx + math.ceil(w/2) > closest_ground_truth:
-                n_hits += 1
-            elif start_idx > closest_ground_truth and start_idx - math.ceil(w/2) < closest_ground_truth:
-                n_hits += 1
-        recall = n_hits / len(ground_truth)
-        precision = n_hits / len(chain)
-        if precision+recall == 0:
-            f1 = -1
-        else:
-            f1 = (2*precision*recall)/(precision+recall)
-
-    return {"Length": chain_length,
-            "Effective Length": effective_length,
-            "Correlation Length": correlation_length,
-            "Recall": recall,
-            "Precision": precision,
-            "F1-Score": f1
-            }
+    n_hits = 0
+    for start_idx in chain:
+        closest_ground_truth = min(ground_truth, key=lambda x:abs(x-start_idx))
+        if start_idx == closest_ground_truth:
+            n_hits += 1
+        elif start_idx < closest_ground_truth and start_idx + math.ceil(w/2) > closest_ground_truth:
+            n_hits += 1
+        elif start_idx > closest_ground_truth and start_idx - math.ceil(w/2) < closest_ground_truth:
+            n_hits += 1
+    recall = n_hits / len(ground_truth)
+    precision = n_hits / len(chain)
+    if precision+recall == 0:
+        f1 = -1
+    else:
+        f1 = (2*precision*recall)/(precision+recall)
+    return ChainScore(*(chain_length, effective_length, correlation_length, recall, precision, f1))
 
 
 def segmentation_fluss_known_cps(T, T_name, cps, ds, L, n_regimes, target_w, m):
