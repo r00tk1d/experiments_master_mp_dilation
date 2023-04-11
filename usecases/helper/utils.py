@@ -1,27 +1,27 @@
 import numpy as np
 import os
 
+def build_file_path(use_case, data_name, d, actual_w, target_w, m, offset, ground_truth_given, calculate_m):
+    file_name = f"{data_name}_d{d}_" + (f"m{m}" if calculate_m else f"w{actual_w}")
+    folder_name = (f"targetw{target_w}" if calculate_m else f"m{m}") + (f"_offsetTRUE" if offset else f"_offsetFALSE") + (f"_groundtruthGIVEN" if ground_truth_given else f"_groundtruthD1")
+    file_path = f"../results/{use_case}/{data_name}/{folder_name}/{file_name}"
+    folder_path = f"../results/{use_case}/{data_name}/{folder_name}"
+    return file_path, folder_path
 
-def calculate_max_dilation_size(target_w):
-    """ Calculates the maximum dilation size to get a target range w 
-    with the constraint that each dilation size d needs to be 
-    smaller than the number of values m
-
-    Parameters
-    ----------
-    target_w: int
-        target range for the subsequence
-
-    Returns
-    -------
-    dilation_sizes: list
-        list of possible dilation sizes
-    """
+def calculate_max_dilation_size_from_target_w(target_w: int) -> int:
     d = 1
     m = round((target_w-1)/d) + 1
     while d < m:
         d += 1
         m = round((target_w-1)/d) + 1
+    return d-1
+
+def calculate_max_dilation_size_from_m(m: int, chain_length: int) -> int:
+    d = 1
+    w = (m-1)*d + 1
+    while d < m:
+        d += 1
+        w = (m-1)*d + 1
     return d-1
 
 def get_min_max_from_lists(list1, list2) -> tuple:
@@ -43,7 +43,6 @@ def remove_overlapping_chains(all_chain_set, m, d):
             all_non_overlapping_chain_set.append(all_chain_set[i])
             non_overlapping_unanchored_chain = _set_best_chain(non_overlapping_unanchored_chain, all_chain_set[i])
     return all_non_overlapping_chain_set, non_overlapping_unanchored_chain
-
 
 
 def _check_non_overlap(seq_one, seq_two, w):

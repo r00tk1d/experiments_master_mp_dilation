@@ -13,7 +13,8 @@ class Result(NamedTuple):
     non_overlapping_unanchored_chain: np.ndarray
     unanchored_chain_score: dict
     non_overlapping_unanchored_chain_score: dict
-    ground_truth: np.ndarray
+    ground_truth_chain: list
+    ground_truth_non_overlapping_chain: list
     offset_start: int
 
 def save(np_arrays: list, file_path):

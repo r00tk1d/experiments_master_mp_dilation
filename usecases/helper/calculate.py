@@ -15,47 +15,34 @@ class ChainScore(NamedTuple):
     precision: float
     f1_score: float
 
-def chains_old(T, ds, target_w, data_name, use_case, ground_truth = None):
-    for d in ds:
-        m = round((target_w-1)/d) + 1
-        actual_w = (m-1)*d + 1
-        file_name = data_name + "_d" + str(d) + "_m" + str(m)
-        file_path = "../results/" + use_case + "/" + data_name + "/" + "target_w" + str(target_w) + "/" + file_name
-
-        if d == 1:
-            mp = stumpy.stump(T, m=m)
-        else:
-            mp = stumpy.stump_dil(T, m=m, d=d)
-        print("Calculated MP for: w=" + str(actual_w) + ", m=" + str(m) + ", d=" + str(d))
-        all_chain_set, unanchored_chain = stumpy.allc(mp[:, 2], mp[:, 3])
-        all_non_overlapping_chain_set, non_overlapping_unanchored_chain = utils.remove_overlapping_chains(all_chain_set, m, d)
-
-        # length_unanchored_chain = unanchored_chain[-1] - unanchored_chain[0]
-        # length_non_overlapping_unanchored_chain = non_overlapping_unanchored_chain[-1] - non_overlapping_unanchored_chain[0]
-
-        unanchored_chain_score = _chain_score(unanchored_chain, T, d, m, ground_truth)
-        non_overlapping_unanchored_chain_score = _chain_score(non_overlapping_unanchored_chain, T, d, m, ground_truth)
-
-        results.save([T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score, ground_truth], file_path + ".npy")
-
-def chains(T, max_dilation, target_w, data_name, use_case, ground_truth, offset):
+def chains(T, max_dilation, data_name, use_case, ground_truth_chain, offset, target_w, m):
     """
     Calculates the chains for a given time series {T} and a given list of dilations {ds}.
     The chains are calculated for a given target window range {target_w}.
-    If offset is set to true, the chains with a dilation size above 1 are calculated with an offset determined by the starting point of the unanchored chain without dilation. The ground truth is then set to the unanchored chain without dilation.
+    If {offset} is set to true, the chains with a dilation size above 1 are calculated with an offset determined by the starting point of the unanchored chain without dilation. 
+    If {ground_truth} is None, ground_truth set to the unanchored chain without dilation. (same for {non_overlapping_ground_truth})
     """
+    assert (target_w is None) != (m is None)
+    if target_w:
+        calculate_m = True
+    else:
+        calculate_m = False
+    
     offset_start = 0
+    ground_truth_given = ground_truth_chain is not None
+    ground_truth_non_overlapping_chain = ground_truth_chain
+    scores = []
     for d in range(1, max_dilation+1):
-        m = round((target_w-1)/d) + 1
+        if calculate_m:
+            m = round((target_w-1)/d) + 1
         actual_w = (m-1)*d + 1
-        file_name = data_name + "_d" + str(d) + "_m" + str(m)
-        file_path = f"../results/{use_case}/{data_name}/target_w{target_w}" + (f"_with_offset" if offset else "") + f"/{file_name}"
+        file_path, _ = utils.build_file_path(use_case, data_name, d, actual_w, target_w, m, offset, ground_truth_given, calculate_m)
 
         if d == 1:
             mp = stumpy.stump(T, m=m)
         else:
             mp = stumpy.stump_dil(T[offset_start:], m=m, d=d)
-        print("Calculated MP for: w=" + str(actual_w) + ", m=" + str(m) + ", d=" + str(d) + ", offset=" + str(offset_start))
+        print(f"Calculated MP for: w={actual_w}, m={m}, d={d}, offset={offset_start}, groundtruthD1={not ground_truth_given!s}")
 
         all_chain_set, unanchored_chain = stumpy.allc(mp[:, 2], mp[:, 3])
         unanchored_chain = np.array([x + offset_start for x in unanchored_chain])
@@ -66,13 +53,14 @@ def chains(T, max_dilation, target_w, data_name, use_case, ground_truth, offset)
         # length_unanchored_chain = unanchored_chain[-1] - unanchored_chain[0]
         # length_non_overlapping_unanchored_chain = non_overlapping_unanchored_chain[-1] - non_overlapping_unanchored_chain[0]
 
-        if not ground_truth and d==1:
-            ground_truth = list(unanchored_chain)
+        if not ground_truth_chain and d==1:
+            ground_truth_chain = list(unanchored_chain)
+            ground_truth_non_overlapping_chain = list(non_overlapping_unanchored_chain)
 
-        unanchored_chain_score = _chain_score(unanchored_chain, T, d, m, ground_truth)
-        non_overlapping_unanchored_chain_score = _chain_score(non_overlapping_unanchored_chain, T, d, m, ground_truth)
+        unanchored_chain_score = _chain_score(unanchored_chain, T, d, m, ground_truth_chain)
+        non_overlapping_unanchored_chain_score = _chain_score(non_overlapping_unanchored_chain, T, d, m, ground_truth_non_overlapping_chain)
 
-        results.save([T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score, ground_truth, offset_start], file_path + ".npy")
+        results.save([T, m, d, mp, all_chain_set, all_non_overlapping_chain_set, unanchored_chain, non_overlapping_unanchored_chain, unanchored_chain_score, non_overlapping_unanchored_chain_score, ground_truth_chain, ground_truth_non_overlapping_chain, offset_start], file_path + ".npy")
 
         if offset and d==1:
             offset_start = unanchored_chain[0]
