@@ -8,7 +8,7 @@ def build_file_path(use_case, data_name, d, actual_w, target_w, m, offset, groun
     folder_path = f"../results/{use_case}/{data_name}/{folder_name}"
     return file_path, folder_path
 
-def calculate_max_dilation_size_from_target_w(target_w: int) -> int:
+def calculate_max_d_from_target_w(target_w: int) -> int:
     d = 1
     m = round((target_w-1)/d) + 1
     while d < m:
@@ -16,18 +16,18 @@ def calculate_max_dilation_size_from_target_w(target_w: int) -> int:
         m = round((target_w-1)/d) + 1
     return d-1
 
-def calculate_max_dilation_size_from_m(m: int, chain_length: int) -> int:
+def calculate_max_d_from_m(m: int, time_series_length: int, max_d: int) -> int:
     d = 1
     w = (m-1)*d + 1
-    while d < m:
+    while w < time_series_length:
         d += 1
         w = (m-1)*d + 1
-    return d-1
+    return min(max_d, d-1)
 
-def get_min_max_from_lists(list1, list2) -> tuple:
-    min_value = min(min(list1), min(list2))
-    max_value = max(max(list1), max(list2))
-    return (min_value, max_value)
+# def get_min_max_from_lists(list1, list2) -> tuple:
+#     min_value = min(min(list1), min(list2))
+#     max_value = max(max(list1), max(list2))
+#     return (min_value, max_value)
 
 def remove_overlapping_chains(all_chain_set, m, d):
     w = (m-1)*d + 1

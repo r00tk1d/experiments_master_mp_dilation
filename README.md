@@ -13,12 +13,28 @@
 10. Download the UCR Time Series Classification Archive and unpack it in the root directory
 
 ## Good to Know ##
-If you make chances in stumpy, restart the jupyter kernel to apply the changes and use them in the jupyter notebook
+If you make changes in stumpy, restart the jupyter kernel to apply the changes and use them in the jupyter notebook
 
 ## Known Problems ##
 
 Stumpy Import Error: version 'GLIBCXX_3.4.30' not found: `conda install -c conda-forge gcc=12.1.0`
 
-## Semantic Segmentation ##
-There is a dataset for semantic segmentation (MP VIII) which is used in segmentation.py to benchmark.
+## Chains ##
+Experiment Options:
+- target_w or m
+- offset true or false
+- groundtruth given or taken from no dilation run
 
+-> Possible Goals with the experiments:
+- Discover new chains
+- Get the same results with and without dilation
+- Discover Artificial Chains with dilation compared to without dilation (robustnes test)
+
+## Segmentation ##
+- unknown Change Points with fixed target range
+- unknown Change Points with fixed window size
+- known Change Points with fixed target range
+- known Change Points with fixed window size
+
+-> Possible Goals with the experiments:
+- benchmark with tssb
