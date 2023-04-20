@@ -8,13 +8,9 @@ class Result(NamedTuple):
     d: int
     mp: np.ndarray
     all_chain_set: np.ndarray
-    all_non_overlapping_chain_set: np.ndarray
-    unanchored_chain: np.ndarray
-    non_overlapping_unanchored_chain: np.ndarray
-    unanchored_chain_score: dict
-    non_overlapping_unanchored_chain_score: dict
+    chain: np.ndarray
+    chain_score: dict
     ground_truth_chain: list
-    ground_truth_non_overlapping_chain: list
     offset_start: int
 
 def save(np_arrays: list, file_path):

@@ -25,11 +25,13 @@ Experiment Options:
 - offset true or false
 - groundtruth given or taken from no dilation run
 
--> Possible Goals with the experiments:
-- Discover new chains
-- Get the same results with and without dilation
-- Discover Artificial Chains with dilation compared to without dilation (robustnes test)
-
+-> Different types of experiments (and goals):
+- Case studys (penguin, tilttable, ..?) Goals:
+    - Discover new chains
+    - Get the same results with and without dilation
+- Artificial Time Series (chain_test_1/2/3/4) (MP VII Paper)
+    - Discover Artificial Chains with dilation compared to without dilation
+- UCR Dataset with Noise and artificial chains (Robustness Paper)
 ## Segmentation ##
 - unknown Change Points with fixed target range
 - unknown Change Points with fixed window size

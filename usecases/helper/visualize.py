@@ -6,7 +6,7 @@ from matplotlib.patches import Rectangle
 from . import results
 from . import utils
 
-def chains(max_dilation, data_name, use_case, offset, target_w, m, ground_truth_chain):
+def chains(max_dilation, data_name, use_case, offset, non_overlapping, target_w, m, ground_truth_chain):
     plt.rcParams.update({'figure.max_open_warning': 0})
 
     assert (target_w is None) != (m is None)
@@ -16,89 +16,70 @@ def chains(max_dilation, data_name, use_case, offset, target_w, m, ground_truth_
         calculate_m = False
     ground_truth_given = ground_truth_chain is not None
 
-    unanchored_chain_scores = []
-    non_overlapping_unanchored_chain_scores = []
+    chain_scores = []
     ds = [d for d in range(1, max_dilation+1)]
 
     for d in ds:
         if calculate_m:
             m = round((target_w-1)/d) + 1
         actual_w = (m-1)*d + 1
-        file_path, folder_path = utils.build_file_path(use_case, data_name, d, actual_w, target_w, m, offset, ground_truth_given, calculate_m)
+        file_path, folder_path = utils.build_file_path(use_case, data_name, d, actual_w, target_w, m, offset, ground_truth_given, calculate_m, non_overlapping)
 
         result = results.load(file_path + ".npy")
 
-        unanchored_chain_scores.append(result.unanchored_chain_score)
-        non_overlapping_unanchored_chain_scores.append(result.non_overlapping_unanchored_chain_score)
+        chain_scores.append(result.chain_score)
         
-        # unanchored chain
-        plot = _chain_unanchored(result.T, result.unanchored_chain, m, d, "Unanchored Chain")
-        plot.savefig(file_path + "_unanchored")
-        plot = _chain_unanchored_snippets(result.T, result.unanchored_chain, m, d, "Unanchored Chain")
-        plot.savefig(file_path + "_unanchored_snippets")
-
-        # non overlapping unanchored chain
-        plot = _chain_unanchored(result.T, result.non_overlapping_unanchored_chain, m, d, "Non Overlapping Unanchored Chain")
-        plot.savefig(file_path + "_non_overlapping_unanchored")
-        plot = _chain_unanchored_snippets(result.T, result.non_overlapping_unanchored_chain, m, d, "Non Overlapping Unanchored Chain")
-        plot.savefig(file_path + "_non_overlapping_unanchored_snippets")
+        # detected chain
+        title = f"Detected Non Overlapping Chain" if non_overlapping else f"Detected Chain"
+        plot = _chain(result.T, result.chain, m, d, title)
+        plot.savefig(file_path + "_chain")
+        plot = _chain_snippets(result.T, result.chain, m, d, title)
+        plot.savefig(file_path + "_chain_snippets")
     
-    _chain_elbowplots(ds, unanchored_chain_scores, non_overlapping_unanchored_chain_scores, target_w, data_name, use_case, offset, folder_path)
+    _chain_elbowplots(ds, chain_scores, target_w, data_name, use_case, offset, non_overlapping, folder_path)
 
-def _chain_elbowplots(ds, unanchored_chain_scores, non_overlapping_unanchored_chain_scores, target_w, data_name, use_case, offset, folder_path):
+def _chain_elbowplots(ds, chain_scores, target_w, data_name, use_case, offset, non_overlapping, folder_path):
     # elbow plot for ds length
-    lengths_unanchored_chains = [chain_score.length for chain_score in unanchored_chain_scores]
-    lengths_non_overlapping_unanchored_chains = [chain_score.length for chain_score in non_overlapping_unanchored_chain_scores]
-    y_lim = (0, max(max(lengths_unanchored_chains), max(lengths_non_overlapping_unanchored_chains)))
-    plot = _chain_elbowplot(lengths_unanchored_chains, ds, y_lim, "Length Chain")
+    lengths_chains = [chain_score.length for chain_score in chain_scores]
+    y_lim = (0, max(lengths_chains))
+    title = f"Length Non Overlapping Chain" if non_overlapping else f"Length Chain"
+    plot = _chain_elbowplot(lengths_chains, ds, y_lim, title)
     plot.savefig(folder_path + "/_plot_length")
-    plot = _chain_elbowplot(lengths_non_overlapping_unanchored_chains, ds, y_lim, "Length Non Overlapping Chain")
-    plot.savefig(folder_path + "/_plot_non_overlapping_length")
 
     # elbow plot for ds effective length
-    effective_lengths_unanchored_chains = [chain_score.effective_length for chain_score in unanchored_chain_scores]
-    effective_lengths_non_overlapping_unanchored_chains = [chain_score.effective_length for chain_score in non_overlapping_unanchored_chain_scores]
-    y_lim = (0, max(max(effective_lengths_unanchored_chains), max(effective_lengths_non_overlapping_unanchored_chains)))
-    plot = _chain_elbowplot(effective_lengths_unanchored_chains, ds, y_lim, "Effective Length Chain")
+    effective_lengths_chains = [chain_score.effective_length for chain_score in chain_scores]
+    y_lim = (0, max(effective_lengths_chains))
+    title = f"Effective Length Non Overlapping Chain" if non_overlapping else f"Effective Length Chain"
+    plot = _chain_elbowplot(effective_lengths_chains, ds, y_lim, title)
     plot.savefig(folder_path + "/_plot_effective_length")
-    plot = _chain_elbowplot(effective_lengths_non_overlapping_unanchored_chains, ds, y_lim, "Effective Length Non Overlapping Chain")
-    plot.savefig(folder_path + "/_non_overlapping_plot_effective_length")
 
     # elbow plot for ds correlation length
-    correlation_lengths_unanchored_chains = [chain_score.correlation_length for chain_score in unanchored_chain_scores]
-    correlation_lengths_non_overlapping_unanchored_chains = [chain_score.correlation_length for chain_score in non_overlapping_unanchored_chain_scores]
-    y_lim = (0, max(max(correlation_lengths_unanchored_chains), max(correlation_lengths_non_overlapping_unanchored_chains)))
-    plot = _chain_elbowplot(correlation_lengths_unanchored_chains, ds, y_lim, "Correlation Length Chain")
+    correlation_lengths_chains = [chain_score.correlation_length for chain_score in chain_scores]
+    y_lim = (0, max(correlation_lengths_chains))
+    title = f"Correlation Length Non Overlapping Chain" if non_overlapping else f"Correlation Length Chain"
+    plot = _chain_elbowplot(correlation_lengths_chains, ds, y_lim, title)
     plot.savefig(folder_path + "/_plot_correlation_length")
-    plot = _chain_elbowplot(correlation_lengths_non_overlapping_unanchored_chains, ds, y_lim, "Correlation Length Non Overlapping Chain")
-    plot.savefig(folder_path + "/_non_overlapping_plot_correlation_length")
 
     # elbow plot for ds recall
-    recall_unanchored_chains = [chain_score.recall for chain_score in unanchored_chain_scores]
-    recall_non_overlapping_unanchored_chains = [chain_score.recall for chain_score in non_overlapping_unanchored_chain_scores]
-    y_lim = (0, max(max(recall_unanchored_chains), max(recall_non_overlapping_unanchored_chains)))
-    plot = _chain_elbowplot(recall_unanchored_chains, ds, y_lim, "Recall Chain")
+    recall_chains = [chain_score.recall for chain_score in chain_scores]
+    y_lim = (0, max(recall_chains))
+    title = f"Recall Non Overlapping Chain" if non_overlapping else f"Recall Chain"
+    plot = _chain_elbowplot(recall_chains, ds, y_lim, title)
     plot.savefig(folder_path + "/_plot_recall")
-    plot = _chain_elbowplot(recall_non_overlapping_unanchored_chains, ds, y_lim, "Recall Non Overlapping Chain")
-    plot.savefig(folder_path + "/_non_overlapping_plot_recall")
 
     # elbow plot for ds precision
-    precision_unanchored_chains = [chain_score.precision for chain_score in unanchored_chain_scores]
-    precision_non_overlapping_unanchored_chains = [chain_score.precision for chain_score in non_overlapping_unanchored_chain_scores]
-    y_lim = (0, max(max(precision_unanchored_chains), max(precision_non_overlapping_unanchored_chains)))
-    plot = _chain_elbowplot(precision_unanchored_chains, ds, y_lim, "Precision Chain")
+    precision_chains = [chain_score.precision for chain_score in chain_scores]
+    y_lim = (0, max(precision_chains))
+    title = f"Precision Non Overlapping Chain" if non_overlapping else f"Precision Chain"
+    plot = _chain_elbowplot(precision_chains, ds, y_lim, title)
     plot.savefig(folder_path + "/_plot_precision")
-    plot = _chain_elbowplot(precision_non_overlapping_unanchored_chains, ds, y_lim, "Precision Non Overlapping Chain")
-    plot.savefig(folder_path + "/_non_overlapping_plot_precision")
 
     # elbow plot for ds f1 score
-    f1_unanchored_chains = [chain_score.f1_score for chain_score in unanchored_chain_scores]
-    f1_non_overlapping_unanchored_chains = [chain_score.f1_score for chain_score in  non_overlapping_unanchored_chain_scores]
-    y_lim = (0, max(max(f1_unanchored_chains), max(f1_non_overlapping_unanchored_chains)))
-    plot = _chain_elbowplot(f1_unanchored_chains, ds, y_lim, "F1-Score Chain")
+    f1_chains = [chain_score.f1_score for chain_score in chain_scores]
+    y_lim = (0, max(f1_chains))
+    title = f"F1-Score Non Overlapping Chain" if non_overlapping else f"F1-Score Chain"
+    plot = _chain_elbowplot(f1_chains, ds, y_lim, title)
     plot.savefig(folder_path + "/_plot_f1")
-    plot = _chain_elbowplot(f1_non_overlapping_unanchored_chains, ds, y_lim, "F1-Score Non Overlapping Chain")
-    plot.savefig(folder_path + "/_non_overlapping_plot_f1")
     
 
 def _discord(T, m, d, mp, discord_idx):
@@ -134,25 +115,25 @@ def _motif_pair(T, m, d, mp, top_motif_pair_idxs):
     axs[1].plot(mp[:, 0])
     return plt
 
-def _chain_unanchored(T, unanchored_chain, m, d, title):
+def _chain(T, chain, m, d, title):
     w = ((m-1)*d + 1)
     T = pd.DataFrame(T)
     plt.figure(figsize=(12, 2))
     plt.plot(T, linewidth=1, color='black')
-    for i in range(unanchored_chain.shape[0]):
-        y = T.iloc[unanchored_chain[i]:unanchored_chain[i]+w]
+    for i in range(chain.shape[0]):
+        y = T.iloc[chain[i]:chain[i]+w]
         x = y.index.values
         plt.plot(x, y, linewidth=3)
     plt.suptitle(title + ' (m = ' + str(m) + ', d = ' + str(d) + ')', fontsize='15')
     return plt
 
-def _chain_unanchored_snippets(T, unanchored_chain, m, d, title):
+def _chain_snippets(T, chain, m, d, title):
     w = ((m-1)*d + 1)
     T = pd.DataFrame(T)
     plt.figure(figsize=(12, 2))
     plt.axis('off')
-    for i in range(unanchored_chain.shape[0]):
-        data = T.iloc[unanchored_chain[i]:unanchored_chain[i]+w].reset_index().values
+    for i in range(chain.shape[0]):
+        data = T.iloc[chain[i]:chain[i]+w].reset_index().values
         x = data[:, 0]
         y = data[:, 1]
         plt.plot(x-x.min()+(w+15)*i, y-y.min(), linewidth=3)
