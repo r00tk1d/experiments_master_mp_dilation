@@ -18,6 +18,7 @@ def chains(max_dilation, data_name, use_case, offset, non_overlapping, target_w,
 
     chain_scores = []
     ds = [d for d in range(1, max_dilation+1)]
+    print(f"Visualizing Experiment: target_w={target_w}, m={m}, offset={offset!s}, groundtruthD1={not ground_truth_given!s}, nonoverlapping={non_overlapping!s}")
 
     for d in ds:
         if calculate_m:
@@ -26,6 +27,7 @@ def chains(max_dilation, data_name, use_case, offset, non_overlapping, target_w,
         file_path, folder_path = utils.build_file_path(use_case, data_name, d, actual_w, target_w, m, offset, ground_truth_given, calculate_m, non_overlapping)
 
         result = results.load(file_path + ".npy")
+        print(f"chain for d={result.d}: {result.chain}")
 
         chain_scores.append(result.chain_score)
         

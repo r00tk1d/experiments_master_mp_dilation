@@ -20,9 +20,10 @@ def chains(T, max_dilation, data_name, use_case, ground_truth_chain, offset, non
     Calculates the chains for a given time series {T} and a given list of dilations {ds}.
     The chains are calculated for a given target window range {target_w}.
     If {offset} is set to true, the chains with a dilation size above 1 are calculated with an offset determined by the starting point of the unanchored chain without dilation. 
-    If {ground_truth} is None, ground_truth set to the unanchored chain without dilation. (same for {non_overlapping_ground_truth})
+    If {ground_truth} is None, ground_truth set to the unanchored chain without dilation.
     """
-    assert (target_w is None) != (m is None)
+    assert (target_w is None) != (m is None), "only one of target_w and m can be set"
+    assert not (offset and non_overlapping), "offset and non_overlapping cannot be true at the same time"	
     if target_w:
         calculate_m = True
     else:
@@ -30,6 +31,9 @@ def chains(T, max_dilation, data_name, use_case, ground_truth_chain, offset, non
     
     offset_start = 0
     ground_truth_given = ground_truth_chain is not None
+
+    print(f"Running Experiment: target_w={target_w}, m={m}, offset={offset!s}, groundtruthD1={not ground_truth_given!s}, nonoverlapping={non_overlapping!s}")
+
     for d in range(1, max_dilation+1):
         if calculate_m:
             m = round((target_w-1)/d) + 1
@@ -39,26 +43,35 @@ def chains(T, max_dilation, data_name, use_case, ground_truth_chain, offset, non
         if d == 1:
             mp = stumpy.stump(T, m=m)
         else:
-            mp = stumpy.stump_dil(T[offset_start:], m=m, d=d)
+            mp = stumpy.stump_dil(T, m=m, d=d)
         print(f"Calculated MP for: w={actual_w}, m={m}, d={d}, offset={offset_start}, groundtruthD1={not ground_truth_given!s}, nonoverlapping={non_overlapping!s}")
 
-        all_chain_set, unanchored_chain = stumpy.allc(mp[:, 2], mp[:, 3])
-        unanchored_chain = np.array([x + offset_start for x in unanchored_chain])
+        if offset and d != 1:
+            chain = stumpy.atsc(mp[:, 2], mp[:, 3], offset_start)
+            all_chain_set = [chain]
+        else:
+            all_chain_set, chain = stumpy.allc(mp[:, 2], mp[:, 3])
+
         if non_overlapping:
-            all_chain_set, unanchored_chain = utils.remove_overlapping_chains(all_chain_set, m, d)
-            unanchored_chain = np.array([x + offset_start for x in unanchored_chain])
+            all_chain_set, chain = utils.remove_overlapping_chains(all_chain_set, m, d)
+            chain = np.array([x + offset_start for x in chain])
 
         if not ground_truth_chain and d==1:
-            ground_truth_chain = list(unanchored_chain)
+            ground_truth_chain = list(chain)
 
-        unanchored_chain_score = _chain_score(unanchored_chain, T, d, m, ground_truth_chain)
+        chain_score = _get_chain_score(chain, T, d, m, ground_truth_chain)
 
-        results.save([T, m, d, mp, all_chain_set, unanchored_chain, unanchored_chain_score, ground_truth_chain, offset_start], file_path + ".npy")
+        results.save([T, m, d, mp, all_chain_set, chain, chain_score, ground_truth_chain, offset_start], file_path + ".npy")
 
         if offset and d==1:
-            offset_start = unanchored_chain[0]
+            offset_start = chain[0]
 
-def _chain_score(chain, T, d, m, ground_truth = None) -> ChainScore:
+def _get_chain_score(chain, T, d, m, ground_truth) -> ChainScore:
+    if len(chain) == 0:
+        return ChainScore(*(0, 0, 0, 0, 0, -1))
+    elif len(chain) == 1:
+        return ChainScore(*(1, 0, 0, 0, 0, -1))
+    
     T_norm = (T - np.mean(T)) / np.std(T)
 
     # obtain chain subsequences
