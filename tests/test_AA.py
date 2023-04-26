@@ -13,7 +13,7 @@ class TestStumpDilAA(unittest.TestCase):
         ["dilation_4", 1000, 30, 4, [559, 684]],
         ["dilation_7", 1000, 30, 7, [559, 684]],
         ["window_10", 1000, 10, 2, [559, 684]],
-        ["window_3", 1000, 3, 2, [559, 684]],
+        ["window_5", 1000, 5, 2, [559, 684]],
         ["window_50", 1000, 50, 2, [559, 684]],
         ["motif_first_and_last", 1000, 30, 2, [0, 1000 - 1 - (30-1)*2]],
         ["motif_first_and_middle", 1000, 30, 2, [0, 630]],
@@ -32,7 +32,12 @@ class TestStumpDilAA(unittest.TestCase):
         motif_idx = np.argsort(mp_dil[:, 0])[0]
         motif_nearest_neighbor_idx = mp_dil[motif_idx, 1]
         motif_pair_indices = [motif_idx, motif_nearest_neighbor_idx]
-        self.assertEqual(motif_pair_indices.sort(), expected_motif_pair_indices.sort())
+        motif_pair_indices.sort()
+        expected_motif_pair_indices.sort()
+        self.assertEqual(motif_pair_indices, expected_motif_pair_indices) # matrix profile indices motif
+        self.assertEqual(mp_dil[motif_pair_indices[1], 2], expected_motif_pair_indices[0]) # left matrix profile index motif
+        self.assertEqual(mp_dil[motif_pair_indices[0], 3], expected_motif_pair_indices[1]) # right matrix profile index motif
+        self.assertTrue(self._check_lr_indices(mp_dil)) # left and right matrix profile indices are syntactically correct
 
 
     def test_stump_dil_without_dilation(self):
@@ -58,6 +63,19 @@ class TestStumpDilAA(unittest.TestCase):
             first_motif_index += dilation_size
             second_motif_index += dilation_size
         return T
+
+    def _check_lr_indices(self, matrix_profile):
+        """
+        Checks if left and right matrix profile indices are syntactically correct
+        """
+        for idx, row in enumerate(matrix_profile):
+            if row[2] >= idx:
+                return False
+            if row[3] <= idx and row[3] != -1:
+                return False
+        return True
+
+
 
 if __name__ == '__main__':
     unittest.main()
