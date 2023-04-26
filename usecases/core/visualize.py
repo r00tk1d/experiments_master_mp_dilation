@@ -27,7 +27,7 @@ def chains(max_dilation, data_name, use_case, offset, non_overlapping, target_w,
         file_path, folder_path = utils.build_file_path(use_case, data_name, d, actual_w, target_w, m, offset, ground_truth_given, calculate_m, non_overlapping)
 
         result = results.load(file_path + ".npy")
-        print(f"chain for d={result.d}: {result.chain}")
+        print(f"chain for d={result.d}, m={result.m}, w={actual_w}: {result.chain}")
 
         chain_scores.append(result.chain_score)
         
