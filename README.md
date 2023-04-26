@@ -19,6 +19,9 @@ If you make changes in stumpy, restart the jupyter kernel to apply the changes a
 
 Stumpy Import Error: version 'GLIBCXX_3.4.30' not found: `conda install -c conda-forge gcc=12.1.0`
 
+Tests not Running:
+- activate the correct conda environment
+
 ## Chains ##
 Experiment Options:
 - target_w or m
