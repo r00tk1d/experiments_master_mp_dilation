@@ -1,5 +1,6 @@
 import numpy as np
-import os
+
+from . import results
 
 def build_file_path(use_case, data_name, d, actual_w, target_w, m, offset, ground_truth_given, calculate_m, non_overlapping):
     file_name = f"{data_name}_d{d}_" + (f"m{m}" if calculate_m else f"w{actual_w}")
@@ -43,6 +44,31 @@ def remove_overlapping_chains(all_chain_set, m, d):
             all_non_overlapping_chain_set.append(all_chain_set[i])
             non_overlapping_unanchored_chain = _set_best_chain(non_overlapping_unanchored_chain, all_chain_set[i])
     return all_non_overlapping_chain_set, non_overlapping_unanchored_chain
+
+def get_metrics_for_experiment(max_dilation, data_name, use_case, offset, non_overlapping, target_w, m, ground_truth_chain):
+    recall = []
+    precision = []
+    f1_scores = []
+
+    assert (target_w is None) != (m is None)
+    if target_w:
+        calculate_m = True
+    else:
+        calculate_m = False
+    ground_truth_given = ground_truth_chain is not None
+
+    
+    ds = [d for d in range(1, max_dilation+1)]
+    for d in ds:
+        if calculate_m:
+            m = round((target_w-1)/d) + 1
+        actual_w = (m-1)*d + 1
+        file_path, _ = build_file_path(use_case, data_name, d, actual_w, target_w, m, offset, ground_truth_given, calculate_m, non_overlapping)
+        result = results.load(file_path + ".npy")
+        recall.append(result.chain_score.recall)
+        precision.append(result.chain_score.precision)
+        f1_scores.append(result.chain_score.f1_score)
+    return recall, precision, f1_scores
 
 
 def _check_non_overlap(seq_one, seq_two, w):

@@ -6,7 +6,7 @@ from matplotlib.patches import Rectangle
 from . import results
 from . import utils
 
-def chains(max_dilation, data_name, use_case, offset, non_overlapping, target_w, m, ground_truth_chain):
+def chains(max_dilation, data_name, use_case, offset, non_overlapping, target_w, m, ground_truth_chain, visualize_chains=True):
     plt.rcParams.update({'figure.max_open_warning': 0})
 
     assert (target_w is None) != (m is None)
@@ -31,12 +31,13 @@ def chains(max_dilation, data_name, use_case, offset, non_overlapping, target_w,
 
         chain_scores.append(result.chain_score)
         
-        # detected chain
-        title = f"Detected Non Overlapping Chain" if non_overlapping else f"Detected Chain"
-        plot = _chain(result.T, result.chain, m, d, title)
-        plot.savefig(file_path + "_chain")
-        plot = _chain_snippets(result.T, result.chain, m, d, title)
-        plot.savefig(file_path + "_chain_snippets")
+        if visualize_chains:
+            # detected chain
+            title = f"Detected Non Overlapping Chain" if non_overlapping else f"Detected Chain"
+            plot = _chain(result.T, result.chain, m, d, title)
+            plot.savefig(file_path + "_chain")
+            plot = _chain_snippets(result.T, result.chain, m, d, title)
+            plot.savefig(file_path + "_chain_snippets")
     
     _chain_elbowplots(ds, chain_scores, target_w, data_name, use_case, offset, non_overlapping, folder_path)
 

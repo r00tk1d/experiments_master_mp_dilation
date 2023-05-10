@@ -1,6 +1,8 @@
 from typing import NamedTuple
 import numpy as np
 import os
+import pandas as pd
+from . import calculate
 
 class Result(NamedTuple):
     T: np.ndarray
@@ -9,7 +11,7 @@ class Result(NamedTuple):
     mp: np.ndarray
     all_chain_set: np.ndarray
     chain: np.ndarray
-    chain_score: dict
+    chain_score: calculate.ChainScore
     ground_truth_chain: list
     offset_start: int
 
@@ -24,3 +26,6 @@ def save(np_arrays: list, file_path):
 def load(file_path) -> Result:
     result = np.load(file_path, allow_pickle=True)
     return Result(*tuple(result))
+
+def save_stats(df: pd.DataFrame(), path: str):
+    df.to_csv(path, index=False)
