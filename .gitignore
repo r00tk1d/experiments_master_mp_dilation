@@ -6,5 +6,3 @@ UCRArchive_2018
 /data/chains/robustness/gt/*.mat
 # time series for robustness TSC22 dataset
 /data/chains/robustness/ts/*.mat
-# the raw result npy files with plots for robustness with ranking
-/results/chains/robustness_with_ranking

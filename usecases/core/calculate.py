@@ -15,7 +15,7 @@ class ChainScore(NamedTuple):
     precision: float
     f1_score: float
 
-def chains(T, max_dilation, data_name, use_case, ground_truth_chain, offset, non_overlapping, target_w, m):
+def chains(T, max_dilation, data_name, use_case, ground_truth_chain, offset, non_overlapping, target_w, m, offset_value=None):
     """
     Calculates the chains for a given time series {T} and a given list of dilations {ds}.
     The chains are calculated for a given target window range {target_w}.
@@ -46,7 +46,11 @@ def chains(T, max_dilation, data_name, use_case, ground_truth_chain, offset, non
             mp = stumpy.stump_dil(T, m=m, d=d)
         print(f"Calculated MP for: w={actual_w}, m={m}, d={d}, offset={offset_start}, groundtruthD1={not ground_truth_given!s}, nonoverlapping={non_overlapping!s}")
 
-        if offset and d != 1:
+        if offset and offset_value is not None:
+            offset_start = offset_value
+            chain = stumpy.atsc(mp[:, 2], mp[:, 3], offset_start)
+            all_chain_set = [chain]
+        elif offset and d != 1:
             chain = stumpy.atsc(mp[:, 2], mp[:, 3], offset_start)
             all_chain_set = [chain]
         else:
@@ -63,7 +67,7 @@ def chains(T, max_dilation, data_name, use_case, ground_truth_chain, offset, non
 
         results.save([T, m, d, mp, all_chain_set, chain, chain_score, ground_truth_chain, offset_start], file_path + ".npy")
 
-        if offset and d==1:
+        if offset and d==1 and offset_value is None:
             offset_start = chain[0]
 
 def _get_chain_score(chain, T, d, m, ground_truth) -> ChainScore:
