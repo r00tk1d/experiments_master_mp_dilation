@@ -35,9 +35,9 @@ def chains(max_dilation, data_name, use_case, offset, non_overlapping, target_w,
             # detected chain
             title = f"Detected Non Overlapping Chain" if non_overlapping else f"Detected Chain"
             plot = _chain(result.T, result.chain, m, d, title)
-            plot.savefig(file_path + "_chain")
+            plot.savefig(file_path + "_chain", bbox_inches='tight')
             plot = _chain_snippets(result.T, result.chain, m, d, title)
-            plot.savefig(file_path + "_chain_snippets")
+            plot.savefig(file_path + "_chain_snippets", bbox_inches='tight')
     
     _chain_elbowplots(ds, chain_scores, target_w, data_name, use_case, offset, non_overlapping, folder_path)
 
@@ -47,42 +47,42 @@ def _chain_elbowplots(ds, chain_scores, target_w, data_name, use_case, offset, n
     y_lim = (0, max(lengths_chains))
     title = f"Length Non Overlapping Chain" if non_overlapping else f"Length Chain"
     plot = _chain_elbowplot(lengths_chains, ds, y_lim, title)
-    plot.savefig(folder_path + "/_plot_length")
+    plot.savefig(folder_path + "/_plot_length", bbox_inches='tight')
 
     # elbow plot for ds effective length
     effective_lengths_chains = [chain_score.effective_length for chain_score in chain_scores]
     y_lim = (0, max(effective_lengths_chains))
     title = f"Effective Length Non Overlapping Chain" if non_overlapping else f"Effective Length Chain"
     plot = _chain_elbowplot(effective_lengths_chains, ds, y_lim, title)
-    plot.savefig(folder_path + "/_plot_effective_length")
+    plot.savefig(folder_path + "/_plot_effective_length", bbox_inches='tight')
 
     # elbow plot for ds correlation length
     correlation_lengths_chains = [chain_score.correlation_length for chain_score in chain_scores]
     y_lim = (0, max(correlation_lengths_chains))
     title = f"Correlation Length Non Overlapping Chain" if non_overlapping else f"Correlation Length Chain"
     plot = _chain_elbowplot(correlation_lengths_chains, ds, y_lim, title)
-    plot.savefig(folder_path + "/_plot_correlation_length")
+    plot.savefig(folder_path + "/_plot_correlation_length", bbox_inches='tight')
 
     # elbow plot for ds recall
     recall_chains = [chain_score.recall for chain_score in chain_scores]
     y_lim = (0, max(recall_chains))
     title = f"Recall Non Overlapping Chain" if non_overlapping else f"Recall Chain"
     plot = _chain_elbowplot(recall_chains, ds, y_lim, title)
-    plot.savefig(folder_path + "/_plot_recall")
+    plot.savefig(folder_path + "/_plot_recall", bbox_inches='tight')
 
     # elbow plot for ds precision
     precision_chains = [chain_score.precision for chain_score in chain_scores]
     y_lim = (0, max(precision_chains))
     title = f"Precision Non Overlapping Chain" if non_overlapping else f"Precision Chain"
     plot = _chain_elbowplot(precision_chains, ds, y_lim, title)
-    plot.savefig(folder_path + "/_plot_precision")
+    plot.savefig(folder_path + "/_plot_precision", bbox_inches='tight')
 
     # elbow plot for ds f1 score
     f1_chains = [chain_score.f1_score for chain_score in chain_scores]
     y_lim = (0, max(f1_chains))
     title = f"F1-Score Non Overlapping Chain" if non_overlapping else f"F1-Score Chain"
     plot = _chain_elbowplot(f1_chains, ds, y_lim, title)
-    plot.savefig(folder_path + "/_plot_f1")
+    plot.savefig(folder_path + "/_plot_f1", bbox_inches='tight')
     
 
 def _discord(T, m, d, mp, discord_idx):
