@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
+import stumpy
 
 from . import results
 from . import utils
@@ -40,6 +41,41 @@ def chains(max_dilation, data_name, use_case, offset, non_overlapping, target_w,
             plot.savefig(file_path + "_chain_snippets", bbox_inches='tight')
     
     _chain_elbowplots(ds, chain_scores, target_w, data_name, use_case, offset, non_overlapping, folder_path)
+
+def consensusmotif(Ts, Ts_idx, subseq_idx, window_range, d):
+    # visualize consensus motif snippet
+    consensus_motif = Ts[Ts_idx][subseq_idx : subseq_idx + window_range]
+    nn_idx = []
+    for i, T in enumerate(Ts):
+        nn_idx.append(np.argmin(stumpy.core.mass(consensus_motif, T)))
+        lw = 1
+        label = None
+        if i == Ts_idx:
+            lw = 4
+            label = 'Consensus Motif'
+        plt.plot(stumpy.core.z_norm(T[nn_idx[i] : nn_idx[i]+window_range]), lw=lw, label=label)
+
+    plt.title(f'The Consensus Motif (Z-normalized): Dilation = {d}, Range = {window_range}')
+    plt.xlabel('Time (s)')
+    plt.legend()
+    plt.show()
+
+    # plot time series
+    fig, ax = plt.subplots(len(Ts), sharex=True, sharey=True)
+    colors = plt.rcParams["axes.prop_cycle"]()
+    for i, T in enumerate(Ts):
+        ax[i].plot(T, color=next(colors)["color"])
+        ax[i].set_ylim((-330, 1900))
+    plt.subplots_adjust(hspace=0)
+    plt.xlabel('Time')
+
+    # visualize consensus motif on top
+    ymin, ymax = ax[i].get_ylim()
+    for i in range(len(Ts)):
+        r = Rectangle((nn_idx[i], ymin), window_range, ymax-ymin, alpha=0.3)
+        ax[i].add_patch(r)
+    plt.suptitle(f'Dilation = {d}, Range = {window_range}', fontsize=14)
+    plt.show()
 
 def _chain_elbowplots(ds, chain_scores, target_w, data_name, use_case, offset, non_overlapping, folder_path):
     # elbow plot for ds length

@@ -2,6 +2,17 @@ import numpy as np
 
 from . import results
 
+def find_common_strings(list_of_lists: list[list[str]]):
+    if not list_of_lists:
+        return []
+
+    common_strings = set(list_of_lists[0])
+    for sublist in list_of_lists[1:]:
+        common_strings = common_strings.intersection(sublist)
+
+    return list(common_strings)
+
+
 def build_file_path(use_case, data_name, d, actual_w, target_w, m, offset, ground_truth_given, calculate_m, non_overlapping):
     file_name = f"{data_name}_d{d}_" + (f"m{m}" if calculate_m else f"w{actual_w}")
     folder_name = (f"targetw{target_w}" if calculate_m else f"m{m}") + (f"_offsetTRUE" if offset else f"_offsetFALSE") + (f"_groundtruthGIVEN" if ground_truth_given else f"_groundtruthD1") + (f"_nonoverlappingTRUE" if non_overlapping else f"_nonoverlappingFALSE")
