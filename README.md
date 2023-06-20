@@ -10,10 +10,11 @@
 7. `cd stumpy_master_mp_dilation`
 8. `pip install --editable .`
 9. Install Jupyter Kernel (`conda install -n myenv ipykernel --update-deps --force-reinstall`)
-10. Download the UCR Time Series Classification Archive and unpack it in the root directory
 
 ## Good to Know ##
 If you make changes in stumpy, restart the jupyter kernel to apply the changes and use them in the jupyter notebook
+
+With `jupyter nbconvert --to python FILENAME.ipynb` you can create a python file out of the jupyter notebook to execute in the terminal. If you want to run the python file in the background: With `screen -Rd benchmark` create a new screen and run the created python file. To exit the screen `strg-a und strg-d`.
 
 ## Known Problems ##
 
@@ -25,21 +26,12 @@ Tests not Running:
 ## Chains ##
 Experiment Options:
 - target_w or m
-- offset true or false
+- anchored true or false
 - groundtruth given or taken from no dilation run
 
--> Different types of experiments (and goals):
-- Case studys (penguin, tilttable, ..?) Goals:
-    - Discover new chains
-    - Get the same results with and without dilation
-- Artificial Time Series (chain_test_1/2/3/4) (MP VII Paper)
-    - Discover Artificial Chains with dilation compared to without dilation
-- UCR Dataset with Noise and artificial chains (Robustness Paper)
+
 ## Segmentation ##
 - unknown Change Points with fixed target range
 - unknown Change Points with fixed window size
 - known Change Points with fixed target range
 - known Change Points with fixed window size
-
--> Possible Goals with the experiments:
-- benchmark with tssb
