@@ -42,7 +42,8 @@ def chains(max_dilation, data_name, use_case, offset, non_overlapping, target_w,
     
     _chain_elbowplots(ds, chain_scores, target_w, data_name, use_case, offset, non_overlapping, folder_path)
 
-def consensusmotif(Ts, Ts_idx, subseq_idx, window_range, d):
+def consensusmotif(Ts, Ts_idx, subseq_idx, window_range, d, data_name, experiment_name):
+    path = f"../results/consensusmotif/{data_name}/{experiment_name}/{experiment_name}_d{d}_w{window_range}"
     # visualize consensus motif snippet
     consensus_motif = Ts[Ts_idx][subseq_idx : subseq_idx + window_range]
     nn_idx = []
@@ -58,6 +59,7 @@ def consensusmotif(Ts, Ts_idx, subseq_idx, window_range, d):
     plt.title(f'The Consensus Motif (Z-normalized): Dilation = {d}, Range = {window_range}')
     plt.xlabel('Time (s)')
     plt.legend()
+    plt.savefig(path + "_snippet", bbox_inches='tight')
     plt.show()
 
     # plot time series
@@ -75,6 +77,7 @@ def consensusmotif(Ts, Ts_idx, subseq_idx, window_range, d):
         r = Rectangle((nn_idx[i], ymin), window_range, ymax-ymin, alpha=0.3)
         ax[i].add_patch(r)
     plt.suptitle(f'Dilation = {d}, Range = {window_range}', fontsize=14)
+    plt.savefig(path + "_ts", bbox_inches='tight')
     plt.show()
 
 def _chain_elbowplots(ds, chain_scores, target_w, data_name, use_case, offset, non_overlapping, folder_path):
