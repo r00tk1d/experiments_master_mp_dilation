@@ -70,7 +70,7 @@ for count, data_name in enumerate(data_names):
     calculate.chains(T, max_dilation, data_name, use_case, ground_truth, offset, non_overlapping, target_w, m, offset_value=offset_value)
 
     # evaluate
-    recalls, precisions, f1_scores = utils.get_metrics_for_experiment(max_dilation, data_name, use_case, offset, non_overlapping, target_w, m, ground_truth)
+    recalls, precisions, f1_scores, correlation_lengths = utils.get_metrics_for_experiment(max_dilation, data_name, use_case, offset, non_overlapping, target_w, m, ground_truth)
     recall_row = [data_name] + recalls
     recall_table.loc[len(recall_table)] = recall_row
     precision_row = [data_name] + precisions

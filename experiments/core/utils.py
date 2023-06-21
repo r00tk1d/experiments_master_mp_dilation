@@ -60,7 +60,7 @@ def get_metrics_for_experiment(max_dilation, data_name, use_case, offset, non_ov
     recall = []
     precision = []
     f1_scores = []
-    chain_lengths = []
+    correlation_lengths = []
 
     assert (target_w is None) != (m is None)
     if target_w:
@@ -80,8 +80,8 @@ def get_metrics_for_experiment(max_dilation, data_name, use_case, offset, non_ov
         recall.append(result.chain_score.recall)
         precision.append(result.chain_score.precision)
         f1_scores.append(result.chain_score.f1_score)
-        chain_lengths.append(len(result.chain))
-    return recall, precision, f1_scores, chain_lengths
+        correlation_lengths.append(result.chain_score.correlation_length)
+    return recall, precision, f1_scores, correlation_lengths
 
 
 def _check_non_overlap(seq_one, seq_two, w):
