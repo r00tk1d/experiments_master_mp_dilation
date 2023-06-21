@@ -122,7 +122,7 @@ def _get_chain_score(chain, T, d, m, ground_truth) -> ChainScore:
     recall = n_hits / len(ground_truth)
     precision = n_hits / len(chain)
     if precision+recall == 0:
-        f1 = -1
+        f1 = 0
     else:
         f1 = (2*precision*recall)/(precision+recall)
     return ChainScore(*(chain_length, effective_length, correlation_length, recall, precision, f1))

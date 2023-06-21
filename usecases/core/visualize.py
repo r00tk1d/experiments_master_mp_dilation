@@ -9,6 +9,7 @@ from . import utils
 
 def chains(max_dilation, data_name, use_case, offset, non_overlapping, target_w, m, ground_truth_chain, visualize_chains=True):
     plt.rcParams.update({'figure.max_open_warning': 0})
+    plt.rcParams['font.size'] = 18
 
     assert (target_w is None) != (m is None)
     if target_w:
