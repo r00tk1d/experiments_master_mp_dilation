@@ -148,7 +148,7 @@ def segmentation_fluss_known_cps(T, T_name, cps, ds, L, n_regimes, target_w, m):
         cac, found_cps = stumpy.fluss(mp[:, 1], L=L, n_regimes=n_regimes)
         score = covering({0: cps}, found_cps, T.shape[0])
         print(
-            f"Time Series: {T_name}: True Change Points: {cps}, Found Change Points: {found_cps.tolist()}, Score: {score} for d={d}, m={m}, w={actual_w}")
+            f"Time Series: {T_name}: True Change Points: {cps}, Found Change Points: {found_cps.tolist()}, CAC values: {[cac[cp] for cp in found_cps]}, Score: {score} for d={d}, m={m}, w={actual_w}")
         scores.append(score)
     return scores
 
