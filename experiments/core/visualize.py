@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import stumpy
+import os
 
 from . import results
 from . import utils
@@ -60,6 +61,7 @@ def consensusmotif(Ts, Ts_idx, subseq_idx, window_range, d, data_name, experimen
     plt.title(f'The Consensus Motif (Z-normalized): Dilation = {d}, Range = {window_range}')
     plt.xlabel('Time (s)')
     plt.legend()
+    os.makedirs(os.path.dirname(path + "_snippet"), exist_ok=True)
     plt.savefig(path + "_snippet", bbox_inches='tight')
     plt.show()
 
@@ -78,6 +80,7 @@ def consensusmotif(Ts, Ts_idx, subseq_idx, window_range, d, data_name, experimen
         r = Rectangle((nn_idx[i], ymin), window_range, ymax-ymin, alpha=0.3)
         ax[i].add_patch(r)
     plt.suptitle(f'Dilation = {d}, Range = {window_range}', fontsize=14)
+    os.makedirs(os.path.dirname(path + "_ts"), exist_ok=True)
     plt.savefig(path + "_ts", bbox_inches='tight')
     plt.show()
 

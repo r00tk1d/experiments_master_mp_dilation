@@ -1,3 +1,4 @@
+import itertools
 from typing import NamedTuple
 import stumpy
 from . import results
@@ -179,6 +180,34 @@ def segmentation_fluss_unknown_cps(T, T_name, cps, ds, L, threshold, target_w, m
         scores.append(score)
     return scores
 
+def segmentation_fluss_known_cps_ensemble_min(T, T_name, cps, ds, L, n_regimes, target_w, m):
+    assert (target_w is None) != (m is None)
+    if target_w:
+        calculate_m = True
+    else:
+        calculate_m = False
+    
+    cacs = []
+    for d in ds:
+        if calculate_m:
+            m = round((target_w-1)/d) + 1
+        actual_w = (m-1)*d + 1
+
+        if d == 1:
+            mp = stumpy.stump(T, m=m)
+        else:
+            mp = stumpy.stump_dil(T, m=m, d=d)
+        cac, _ = stumpy.fluss(mp[:, 1], L=L, n_regimes=n_regimes)
+        cacs.append(cac)
+    
+    min_cac = _find_min_values(cacs)
+    found_cps = _rea(min_cac, n_regimes, L)
+
+    score = covering({0: cps}, found_cps, T.shape[0])
+    print(f"Time Series: {T_name}: True Change Points: {cps}, Found Change Points: {found_cps.tolist()}, CAC values: {[cac[cp] for cp in found_cps]}, Score: {score} for d={d}, m={m}, w={actual_w}")
+    return score
+
+
 # uses a threshold to determine the cps
 def _rea_unknown_cps(cac, L, threshold, excl_factor=5):
     found_cps = []
@@ -192,3 +221,48 @@ def _rea_unknown_cps(cac, L, threshold, excl_factor=5):
         current_min_idx = np.argmin(tmp_cac)      
     found_cps.sort()
     return np.asarray(found_cps)
+
+# from stumpy:
+def _rea(cac, n_regimes, L, excl_factor=5):
+    regime_locs = np.empty(n_regimes - 1, dtype=np.int64)
+    tmp_cac = copy.deepcopy(cac)
+    for i in range(n_regimes - 1):
+        regime_locs[i] = np.argmin(tmp_cac)
+        excl_start = max(regime_locs[i] - excl_factor * L, 0)
+        excl_stop = min(regime_locs[i] + excl_factor * L, cac.shape[0])
+        tmp_cac[excl_start:excl_stop] = 1.0
+
+    return regime_locs
+
+def _min_mp(mps):
+    min_mp = []
+    for i in range(len(mps[0])):
+        distances = [mp[i,0] for mp in mps]
+        index_min = min(range(len(distances)), key=distances.__getitem__)
+        min_mp.append(mps[index_min][i])
+    return np.array(min_mp).astype(np.float64)
+
+def _adjust_mps_to_same_length(mps):
+    max_length = max(len(mp) for mp in mps)
+    adjusted_mps = []
+    for mp in mps:
+        len_diff = max_length - len(mp)
+        if len_diff == 0:
+            adjusted_mps.append(mp)
+            continue
+        else:
+            filler = np.array([np.array([np.NINF,-1,-1,-1], dtype = object) for _ in range(len_diff)])
+            adjusted_mp = np.concatenate((mp, filler), axis=0)
+            adjusted_mps.append(adjusted_mp)
+    return adjusted_mps
+
+def _find_min_values(lists):
+    min_values = []
+    list_length = len(lists[0])
+
+    for i in range(list_length):
+        values_at_index = [lst[i] for lst in lists]
+        min_value = min(values_at_index)
+        min_values.append(min_value)
+
+    return min_values

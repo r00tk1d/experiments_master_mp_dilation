@@ -1,0 +1,7 @@
+Max Dilation: 7
+Same Japanese Characters in current selection:['L', 'a']
+['so', 're', 'de', 'e', 'L', 'ko', 'n', 'ka', 'i', 'no', 'o', 'L', 'mo', 'ku', 'te', 'ki', 'wa', 'a']
+['mo', 'shi', 'ku', 'wa', 'ho', 'ka', 'no', 'hi', 'to', 'ni', 'ko', 'L', 'ri', 'ga', 'a', 'ru', 'to', 'su', 're', 'ba']
+['a', 'no', 'L', 'be', 'tsu', 'no']
+['no', 'a', 'no', 'L', 'hi', 'to', 'da', 'ke', 'na', 'ra', 'i', 'za', 'shi', 'ra', 'zu', 'se', 'ka', 'i', 'ni', 'mo']
+['hi', 'zi', 'yo', 'L', 'ni', 'a', 'n', 'i', 'ni', 'su', 'ma', 'se', 'ru', 'tsu', 'mo', 'ri', 'de', 'de', 'su', 'ne']
