@@ -200,11 +200,97 @@ def segmentation_fluss_known_cps_ensemble_min(T, T_name, cps, ds, L, n_regimes, 
         cac, _ = stumpy.fluss(mp[:, 1], L=L, n_regimes=n_regimes)
         cacs.append(cac)
     
+    cacs = _adjust_cacs_to_same_length(cacs)
     min_cac = _find_min_values(cacs)
     found_cps = _rea(min_cac, n_regimes, L)
 
     score = covering({0: cps}, found_cps, T.shape[0])
-    print(f"Time Series: {T_name}: True Change Points: {cps}, Found Change Points: {found_cps.tolist()}, CAC values: {[cac[cp] for cp in found_cps]}, Score: {score} for d={d}, m={m}, w={actual_w}")
+    print(f"Time Series: {T_name}: True Change Points: {cps}, Found Change Points: {found_cps.tolist()}, CAC values: {[cac[cp] for cp in found_cps]}, Score: {score}")
+    return score
+
+
+def segmentation_fluss_unknown_cps_ensemble_min(T, T_name, cps, ds, L, threshold, target_w, m):
+    assert (target_w is None) != (m is None)
+    if target_w:
+        calculate_m = True
+    else:
+        calculate_m = False
+    
+    cacs = []
+    for d in ds:
+        if calculate_m:
+            m = round((target_w-1)/d) + 1
+        actual_w = (m-1)*d + 1
+
+        if d == 1:
+            mp = stumpy.stump(T, m=m)
+        else:
+            mp = stumpy.stump_dil(T, m=m, d=d)
+        cac, _ = stumpy.fluss(mp[:, 1], L=L, n_regimes=1)
+        cacs.append(cac)
+    
+    cacs = _adjust_cacs_to_same_length(cacs)
+    min_cac = _find_min_values(cacs)
+    found_cps = _rea_unknown_cps(min_cac, L, threshold)
+
+    score = covering({0: cps}, found_cps, T.shape[0])
+    print(f"Time Series: {T_name}: True Change Points: {cps}, Found Change Points: {found_cps.tolist()}, CAC values: {[cac[cp] for cp in found_cps]}, Score: {score}")
+    return score
+
+def segmentation_fluss_known_cps_ensemble_sum(T, T_name, cps, ds, L, n_regimes, target_w, m):
+    assert (target_w is None) != (m is None)
+    if target_w:
+        calculate_m = True
+    else:
+        calculate_m = False
+    
+    cacs = []
+    for d in ds:
+        if calculate_m:
+            m = round((target_w-1)/d) + 1
+        actual_w = (m-1)*d + 1
+
+        if d == 1:
+            mp = stumpy.stump(T, m=m)
+        else:
+            mp = stumpy.stump_dil(T, m=m, d=d)
+        cac, _ = stumpy.fluss(mp[:, 1], L=L, n_regimes=n_regimes)
+        cacs.append(cac)
+    
+    cacs = _adjust_cacs_to_same_length(cacs)
+    sum_cac = np.array([sum(x) for x in zip(*cacs)]).astype(np.float64)
+    found_cps = _rea(sum_cac, n_regimes, L)
+
+    score = covering({0: cps}, found_cps, T.shape[0])
+    print(f"Time Series: {T_name}: True Change Points: {cps}, Found Change Points: {found_cps.tolist()}, CAC values: {[cac[cp] for cp in found_cps]}, Score: {score}")
+    return score
+
+def segmentation_fluss_unknown_cps_ensemble_sum(T, T_name, cps, ds, L, threshold, target_w, m):
+    assert (target_w is None) != (m is None)
+    if target_w:
+        calculate_m = True
+    else:
+        calculate_m = False
+    
+    cacs = []
+    for d in ds:
+        if calculate_m:
+            m = round((target_w-1)/d) + 1
+        actual_w = (m-1)*d + 1
+
+        if d == 1:
+            mp = stumpy.stump(T, m=m)
+        else:
+            mp = stumpy.stump_dil(T, m=m, d=d)
+        cac, _ = stumpy.fluss(mp[:, 1], L=L, n_regimes=1)
+        cacs.append(cac)
+    
+    cacs = _adjust_cacs_to_same_length(cacs)
+    sum_cac = np.array([sum(x) for x in zip(*cacs)]).astype(np.float64)
+    found_cps = _rea_unknown_cps(sum_cac, L, threshold)
+
+    score = covering({0: cps}, found_cps, T.shape[0])
+    print(f"Time Series: {T_name}: True Change Points: {cps}, Found Change Points: {found_cps.tolist()}, CAC values: {[cac[cp] for cp in found_cps]}, Score: {score}")
     return score
 
 
@@ -234,29 +320,17 @@ def _rea(cac, n_regimes, L, excl_factor=5):
 
     return regime_locs
 
-def _min_mp(mps):
-    min_mp = []
-    for i in range(len(mps[0])):
-        distances = [mp[i,0] for mp in mps]
-        index_min = min(range(len(distances)), key=distances.__getitem__)
-        min_mp.append(mps[index_min][i])
-    return np.array(min_mp).astype(np.float64)
-
-def _adjust_mps_to_same_length(mps):
-    max_length = max(len(mp) for mp in mps)
-    adjusted_mps = []
-    for mp in mps:
+def _adjust_cacs_to_same_length(cacs):
+    max_length = max(len(cac) for cac in cacs)
+    adjusted_cacs = []
+    for mp in cacs:
         len_diff = max_length - len(mp)
-        if len_diff == 0:
-            adjusted_mps.append(mp)
-            continue
-        else:
-            filler = np.array([np.array([np.NINF,-1,-1,-1], dtype = object) for _ in range(len_diff)])
-            adjusted_mp = np.concatenate((mp, filler), axis=0)
-            adjusted_mps.append(adjusted_mp)
-    return adjusted_mps
+        if len_diff != 0:
+            mp = np.append(mp, [1.0]* len_diff) 
+        adjusted_cacs.append(mp)
+    return adjusted_cacs
 
-def _find_min_values(lists):
+def _find_min_values(lists) -> np.ndarray:
     min_values = []
     list_length = len(lists[0])
 
@@ -265,4 +339,4 @@ def _find_min_values(lists):
         min_value = min(values_at_index)
         min_values.append(min_value)
 
-    return min_values
+    return np.array(min_values).astype(np.float64)
