@@ -180,6 +180,36 @@ def segmentation_fluss_unknown_cps(T, T_name, cps, ds, L, threshold, target_w, m
         scores.append(score)
     return scores
 
+def segmentation_fluss_known_cps_ensemble_min_BOTHWINDOWSETTINGS(T, T_name, cps, ds, L, n_regimes, target_w, m):
+    # fixed m
+    cacs = []
+    for d in ds:
+        if d == 1:
+            mp = stumpy.stump(T, m=m)
+        else:
+            mp = stumpy.stump_dil(T, m=m, d=d)
+        cac, _ = stumpy.fluss(mp[:, 1], L=L, n_regimes=n_regimes)
+        cacs.append(cac)
+
+    # fixed target window
+    for d in ds:
+        m = round((target_w-1)/d) + 1
+
+        if d == 1:
+            mp = stumpy.stump(T, m=m)
+        else:
+            mp = stumpy.stump_dil(T, m=m, d=d)
+        cac, _ = stumpy.fluss(mp[:, 1], L=L, n_regimes=n_regimes)
+        cacs.append(cac)
+    
+    cacs = _adjust_cacs_to_same_length(cacs)
+    min_cac = _find_min_values(cacs)
+    found_cps = _rea(min_cac, n_regimes, L)
+
+    score = covering({0: cps}, found_cps, T.shape[0])
+    print(f"Time Series: {T_name}: True Change Points: {cps}, Found Change Points: {found_cps.tolist()}, CAC values: {[cac[cp] for cp in found_cps]}, Score: {score}")
+    return score
+
 def segmentation_fluss_known_cps_ensemble_min(T, T_name, cps, ds, L, n_regimes, target_w, m):
     assert (target_w is None) != (m is None)
     if target_w:
