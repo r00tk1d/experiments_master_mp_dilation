@@ -12,7 +12,7 @@
 9. Install Jupyter Kernel (`conda install -n myenv ipykernel --update-deps --force-reinstall`)
 
 ## Good to Know ##
-If you make changes in stumpy, restart the jupyter kernel to apply the changes and use them in the jupyter notebook
+If you make changes in stumpy, restart the jupyter kernel to apply the changes and use them in the jupyter notebook.
 
 With `jupyter nbconvert --to python FILENAME.ipynb` you can create a python file out of the jupyter notebook to execute in the terminal. If you want to run the python file in the background: With `screen -Rd benchmark` create a new screen and run the created python file. To exit the screen `strg-a und strg-d`.
 
@@ -20,8 +20,7 @@ With `jupyter nbconvert --to python FILENAME.ipynb` you can create a python file
 
 Stumpy Import Error: version 'GLIBCXX_3.4.30' not found: `conda install -c conda-forge gcc=12.1.0`
 
-Tests not Running:
-- activate the correct conda environment
+## Repo Structure ##
 
 ## Chains ##
 Experiment Options:
