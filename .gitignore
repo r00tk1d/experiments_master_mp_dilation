@@ -1,6 +1,7 @@
 __pycache__/
 .vscode
 UCRArchive_2018
+segmentation_MP_VIII
 .pytest_cache
 # ground truth for robustness TSC22 dataset
 /data/chains/robustness/gt/*.mat
