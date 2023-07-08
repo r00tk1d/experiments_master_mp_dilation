@@ -6,7 +6,7 @@ This is the structure of the experiments with its important files for the thesis
 - data                          (time series data)
     - chains
         - robustness            (TSC22 Quantitative Analysis Dataset)
-            - ...               (follow the instructions to download the data)
+            - ...
         - chain_test_ .txt      (TSC17 Quantitative Analysis Dataset)
         - humangaittreadmill.mat (Case Study Qualitative Analysis)  
         - penguinshort.mat  (Case Study Qualitative Analysis)
@@ -25,12 +25,12 @@ This is the structure of the experiments with its important files for the thesis
                 - \_plot_*.png (result overview plots)
                 - _DATANAME_DILATIONSIZE_WINDOWSETTING_ (result data and visuals for specific parameters)
     - segmentation
-        - correlations (evaluates different correlations)
-            - correlation_data_characteristics.ipynb (shows the correlation between specific data characteristics and dilation sizes)
-            - correlation_global.ipynb (shows the correlation between the Covering score of fluss1/flussOracle and data characteristics)
         - segmentation_covering_ .csv (results from the experiments)
         - \_segmentation_covering_ .csv (condensed results from the experiments)
         - competitor_evaluation_ .ipynb (evaluates the condensed results from the experiments and compares them)
+        - correlations (evaluates different correlations)
+            - correlation_data_characteristics.ipynb (shows the correlation between specific data characteristics and dilation sizes)
+            - correlation_global.ipynb (shows the correlation between the Covering score of fluss1/flussOracle and data characteristics)
 - tests (tests for `stumpy_dil()`)
     - test_AA.py (tests for Self-joins)
     - test_AB.py (tests for AB-joins)
@@ -50,11 +50,11 @@ This is the structure of the experiments with its important files for the thesis
 
 
 ## Good to Know ##
-If you make changes in the used code, restart the jupyter kernel to apply the changes and use them in the jupyter notebook.
+If you make changes in the imported code, restart the jupyter kernel to apply the changes and use them in the jupyter notebook.
 
 With `jupyter nbconvert --to python FILENAME.ipynb` you can create a python file out of the jupyter notebook to execute in the terminal. If you want to run the python file in the background: With `screen -Rd benchmark` create a new screen and run the created python file. To exit the screen `strg-a und strg-d`.
 
-## Known Problems ##
+## Error Fixes ##
 
 Stumpy Import Error: version 'GLIBCXX_3.4.30' not found: `conda install -c conda-forge gcc=12.1.0`
 
