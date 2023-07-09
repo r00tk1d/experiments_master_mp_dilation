@@ -49,7 +49,7 @@ This is the structure of the experiments with its important files for the thesis
 10. [Download](https://sites.google.com/view/robust-time-series-chain-22) the TSC22 robustness dataset .mat files into the folders "data/chains/robustness/ts" and "data/chains/robustness/gt"
 
 
-## Good to Know ##
+## Run the Jupyter Notebooks and apply changes ##
 If you make changes in the imported code, restart the jupyter kernel to apply the changes and use them in the jupyter notebook.
 
 With `jupyter nbconvert --to python FILENAME.ipynb` you can create a python file out of the jupyter notebook to execute in the terminal. If you want to run the python file in the background: With `screen -Rd benchmark` create a new screen and run the created python file. To exit the screen `strg-a und strg-d`.
